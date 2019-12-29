@@ -1,0 +1,851 @@
+-- MariaDB dump 10.17  Distrib 10.4.6-MariaDB, for osx10.14 (x86_64)
+--
+-- Host: 127.0.0.1    Database: noleggio
+-- ------------------------------------------------------
+-- Server version	10.1.37-MariaDB-0+deb9u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `attore`
+--
+
+DROP TABLE IF EXISTS `attore`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attore` (
+  `id` varchar(64) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attore`
+--
+
+LOCK TABLES `attore` WRITE;
+/*!40000 ALTER TABLE `attore` DISABLE KEYS */;
+/*!40000 ALTER TABLE `attore` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `catalogo`
+--
+
+DROP TABLE IF EXISTS `catalogo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `catalogo` (
+  `punto_vendita` int(11) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `quantita_disponibile` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`punto_vendita`,`video`),
+  KEY `fk_catalogo_video` (`video`),
+  CONSTRAINT `fk_catalogo_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`),
+  CONSTRAINT `fk_catalogo_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `catalogo`
+--
+
+LOCK TABLES `catalogo` WRITE;
+/*!40000 ALTER TABLE `catalogo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `catalogo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cliente`
+--
+
+DROP TABLE IF EXISTS `cliente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cliente` (
+  `cod_fiscale` varchar(16) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `cognome` varchar(255) NOT NULL,
+  `telefono_abitazione` varchar(10) NOT NULL,
+  `telefono_cellulare` varchar(10) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `documento_liberatoria` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`cod_fiscale`),
+  KEY `fk_cliente_documento_liberatoria` (`documento_liberatoria`),
+  CONSTRAINT `fk_cliente_documento_liberatoria` FOREIGN KEY (`documento_liberatoria`) REFERENCES `documento_liberatoria` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cliente`
+--
+
+LOCK TABLES `cliente` WRITE;
+/*!40000 ALTER TABLE `cliente` DISABLE KEYS */;
+INSERT INTO `cliente` VALUES ('RMGMRC77L13E791','marco','Romagnuolo','066002001','0767222222','marcoromag@gmail.com',NULL);
+/*!40000 ALTER TABLE `cliente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `contratto_noleggio`
+--
+
+DROP TABLE IF EXISTS `contratto_noleggio`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `contratto_noleggio` (
+  `id` varchar(64) NOT NULL,
+  `supporto_seriale` varchar(64) NOT NULL,
+  `supporto_fornitore` varchar(64) NOT NULL,
+  `supporto_punto_vendita` int(11) NOT NULL,
+  `supporto_data_carico` date NOT NULL,
+  `cliente` varchar(64) NOT NULL,
+  `impiegato` varchar(64) NOT NULL,
+  `data_inizio` date NOT NULL,
+  `data_fine` date DEFAULT NULL,
+  `data_restituzione` date DEFAULT NULL,
+  `stato_restituzione` enum('BUONO','DANNEGGIATO') DEFAULT NULL,
+  `totale_pagato` decimal(10,2) DEFAULT NULL,
+  `termine_noleggio` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_contratto_noleggio_supporto` (`supporto_seriale`,`supporto_fornitore`,`supporto_punto_vendita`,`supporto_data_carico`),
+  KEY `fk_contratto_noleggio_cliente` (`cliente`),
+  KEY `fk_contratto_noleggio_impiegato` (`impiegato`),
+  KEY `fk_contratto_termine_noleggio` (`termine_noleggio`),
+  CONSTRAINT `fk_contratto_noleggio_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`cod_fiscale`),
+  CONSTRAINT `fk_contratto_noleggio_impiegato` FOREIGN KEY (`impiegato`) REFERENCES `impiegato` (`matricola`),
+  CONSTRAINT `fk_contratto_noleggio_supporto` FOREIGN KEY (`supporto_seriale`, `supporto_fornitore`, `supporto_punto_vendita`, `supporto_data_carico`) REFERENCES `supporto` (`seriale`, `fornitore`, `punto_vendita`, `data_carico`),
+  CONSTRAINT `fk_contratto_termine_noleggio` FOREIGN KEY (`termine_noleggio`) REFERENCES `termine_noleggio` (`giorni`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contratto_noleggio`
+--
+
+LOCK TABLES `contratto_noleggio` WRITE;
+/*!40000 ALTER TABLE `contratto_noleggio` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contratto_noleggio` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `documento_liberatoria`
+--
+
+DROP TABLE IF EXISTS `documento_liberatoria`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `documento_liberatoria` (
+  `id` varchar(64) NOT NULL,
+  `data_sottoscrizione` date NOT NULL,
+  `posizione_archivio` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documento_liberatoria`
+--
+
+LOCK TABLES `documento_liberatoria` WRITE;
+/*!40000 ALTER TABLE `documento_liberatoria` DISABLE KEYS */;
+/*!40000 ALTER TABLE `documento_liberatoria` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fornitore`
+--
+
+DROP TABLE IF EXISTS `fornitore`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fornitore` (
+  `id` varchar(64) NOT NULL,
+  `nome` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fornitore`
+--
+
+LOCK TABLES `fornitore` WRITE;
+/*!40000 ALTER TABLE `fornitore` DISABLE KEYS */;
+INSERT INTO `fornitore` VALUES ('CLY','Cattleya'),('COL','Columbia'),('PAR','Paramount'),('ZUD','01 Distribuzione');
+/*!40000 ALTER TABLE `fornitore` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `genere`
+--
+
+DROP TABLE IF EXISTS `genere`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `genere` (
+  `nome` varchar(64) NOT NULL,
+  `descrizione` varchar(255) NOT NULL,
+  PRIMARY KEY (`nome`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `genere`
+--
+
+LOCK TABLES `genere` WRITE;
+/*!40000 ALTER TABLE `genere` DISABLE KEYS */;
+/*!40000 ALTER TABLE `genere` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `impiegato`
+--
+
+DROP TABLE IF EXISTS `impiegato`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `impiegato` (
+  `matricola` varchar(64) NOT NULL,
+  `punto_vendita` int(11) NOT NULL,
+  `login` varchar(64) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `tipo` enum('IMPIEGATO','DIRIGENTE') NOT NULL,
+  `nome` varchar(64) NOT NULL,
+  `cognome` varchar(64) NOT NULL,
+  PRIMARY KEY (`matricola`),
+  UNIQUE KEY `un_impiegato_login` (`login`),
+  KEY `fk_impiegato_punto_vendita` (`punto_vendita`),
+  CONSTRAINT `fk_impiegato_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `impiegato`
+--
+
+LOCK TABLES `impiegato` WRITE;
+/*!40000 ALTER TABLE `impiegato` DISABLE KEYS */;
+INSERT INTO `impiegato` VALUES ('MI_2_01',2,'admin_mi_1','password','DIRIGENTE','Admin','Admin'),('RM_1_01',1,'admin_rm_1','password','DIRIGENTE','Admin','Admin');
+/*!40000 ALTER TABLE `impiegato` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `interpretazione`
+--
+
+DROP TABLE IF EXISTS `interpretazione`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `interpretazione` (
+  `attore` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `ruolo` varchar(255) NOT NULL,
+  PRIMARY KEY (`attore`,`video`),
+  KEY `fk_interpretazione_video` (`video`),
+  CONSTRAINT `fk_interpretazione_attore` FOREIGN KEY (`attore`) REFERENCES `attore` (`id`),
+  CONSTRAINT `fk_interpretazione_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `interpretazione`
+--
+
+LOCK TABLES `interpretazione` WRITE;
+/*!40000 ALTER TABLE `interpretazione` DISABLE KEYS */;
+/*!40000 ALTER TABLE `interpretazione` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `prenotazione`
+--
+
+DROP TABLE IF EXISTS `prenotazione`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `prenotazione` (
+  `cliente` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  PRIMARY KEY (`cliente`,`video`),
+  KEY `fk_prenotazione_video` (`video`),
+  CONSTRAINT `fk_prenotazione_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`cod_fiscale`),
+  CONSTRAINT `fk_prenotazione_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `prenotazione`
+--
+
+LOCK TABLES `prenotazione` WRITE;
+/*!40000 ALTER TABLE `prenotazione` DISABLE KEYS */;
+/*!40000 ALTER TABLE `prenotazione` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `punto_vendita`
+--
+
+DROP TABLE IF EXISTS `punto_vendita`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `punto_vendita` (
+  `id` int(11) NOT NULL,
+  `citta` varchar(255) NOT NULL,
+  `indirizzo` varchar(255) NOT NULL,
+  `cap` varchar(5) NOT NULL,
+  `direzione` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `punto_vendita`
+--
+
+LOCK TABLES `punto_vendita` WRITE;
+/*!40000 ALTER TABLE `punto_vendita` DISABLE KEYS */;
+INSERT INTO `punto_vendita` VALUES (1,'Roma','Via Masala 42','00148',NULL),(2,'Milano','Via Montenapoleone 2','20001',NULL),(3,'Portici','Via Libertà 216B','80055',NULL),(4,'Roma','Via Merulana 5','00100',NULL),(5,'Terni','Via sailcazzo','1',NULL),(6,'Latina','Via sailcazzo','2',NULL),(7,'Frosinone','Via Sailcazzo','3',NULL),(8,'Roma','Viale Marconi 50','00141',NULL);
+/*!40000 ALTER TABLE `punto_vendita` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `supporto`
+--
+
+DROP TABLE IF EXISTS `supporto`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `supporto` (
+  `seriale` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `fornitore` varchar(64) NOT NULL,
+  `punto_vendita` int(11) NOT NULL,
+  `data_carico` date NOT NULL,
+  `data_scarico` date DEFAULT NULL,
+  `disponibile` tinyint(1) NOT NULL DEFAULT '1',
+  `stato_fisico` enum('BUONO','DANNEGGIATO') NOT NULL DEFAULT 'BUONO',
+  `costo_supporto` decimal(10,2) DEFAULT NULL,
+  `noleggio_corrente` varchar(64) NOT NULL,
+  PRIMARY KEY (`seriale`,`fornitore`,`punto_vendita`,`data_carico`),
+  KEY `fk_supporto_video` (`video`),
+  KEY `fk_supporto_fornitore` (`fornitore`),
+  KEY `fk_supporto_punto_vendita` (`punto_vendita`),
+  CONSTRAINT `fk_supporto_fornitore` FOREIGN KEY (`fornitore`) REFERENCES `fornitore` (`id`),
+  CONSTRAINT `fk_supporto_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`),
+  CONSTRAINT `fk_supporto_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `supporto`
+--
+
+LOCK TABLES `supporto` WRITE;
+/*!40000 ALTER TABLE `supporto` DISABLE KEYS */;
+/*!40000 ALTER TABLE `supporto` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `termine_noleggio`
+--
+
+DROP TABLE IF EXISTS `termine_noleggio`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `termine_noleggio` (
+  `giorni` int(11) NOT NULL,
+  `importo_iniziale` decimal(10,2) NOT NULL,
+  `importo_gg_successivi` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`giorni`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `termine_noleggio`
+--
+
+LOCK TABLES `termine_noleggio` WRITE;
+/*!40000 ALTER TABLE `termine_noleggio` DISABLE KEYS */;
+INSERT INTO `termine_noleggio` VALUES (3,5.00,1.75),(4,6.00,1.50),(5,6.50,1.25);
+/*!40000 ALTER TABLE `termine_noleggio` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `video`
+--
+
+DROP TABLE IF EXISTS `video`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `video` (
+  `id` varchar(64) NOT NULL,
+  `genere` varchar(64) NOT NULL,
+  `tipo` enum('DISPONIBILE','NON-DISPONIBILE') NOT NULL,
+  `titolo` varchar(255) NOT NULL,
+  `regista` varchar(255) NOT NULL,
+  `casa_produttrice` varchar(255) NOT NULL,
+  `data_disponibilita` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_video_genere` (`genere`),
+  CONSTRAINT `fk_video_genere` FOREIGN KEY (`genere`) REFERENCES `genere` (`nome`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `video`
+--
+
+LOCK TABLES `video` WRITE;
+/*!40000 ALTER TABLE `video` DISABLE KEYS */;
+/*!40000 ALTER TABLE `video` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-12-27 17:43:02
+-- MariaDB dump 10.17  Distrib 10.4.6-MariaDB, for osx10.14 (x86_64)
+--
+-- Host: 127.0.0.1    Database: noleggio
+-- ------------------------------------------------------
+-- Server version	10.1.37-MariaDB-0+deb9u1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `attore`
+--
+
+DROP TABLE IF EXISTS `attore`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attore` (
+  `id` varchar(64) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attore`
+--
+
+LOCK TABLES `attore` WRITE;
+/*!40000 ALTER TABLE `attore` DISABLE KEYS */;
+/*!40000 ALTER TABLE `attore` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `catalogo`
+--
+
+DROP TABLE IF EXISTS `catalogo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `catalogo` (
+  `punto_vendita` int(11) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `quantita_disponibile` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`punto_vendita`,`video`),
+  KEY `fk_catalogo_video` (`video`),
+  CONSTRAINT `fk_catalogo_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`),
+  CONSTRAINT `fk_catalogo_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `catalogo`
+--
+
+LOCK TABLES `catalogo` WRITE;
+/*!40000 ALTER TABLE `catalogo` DISABLE KEYS */;
+INSERT INTO `catalogo` VALUES (1,'VID_01',11),(1,'VID_02',1);
+/*!40000 ALTER TABLE `catalogo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cliente`
+--
+
+DROP TABLE IF EXISTS `cliente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cliente` (
+  `cod_fiscale` varchar(16) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `cognome` varchar(255) NOT NULL,
+  `telefono_abitazione` varchar(10) NOT NULL,
+  `telefono_cellulare` varchar(10) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `documento_liberatoria` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`cod_fiscale`),
+  KEY `fk_cliente_documento_liberatoria` (`documento_liberatoria`),
+  CONSTRAINT `fk_cliente_documento_liberatoria` FOREIGN KEY (`documento_liberatoria`) REFERENCES `documento_liberatoria` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cliente`
+--
+
+LOCK TABLES `cliente` WRITE;
+/*!40000 ALTER TABLE `cliente` DISABLE KEYS */;
+INSERT INTO `cliente` VALUES ('RMGMRA77L13E791R','Mario','Romagnuolo','066020002','0767778238','marcoromag@gmail.com',NULL),('RMGMRC77L13E791','marco','Romagnuolo','066002001','0767222222','marcoromag@gmail.com','CI00002'),('RMGMRC77L13E792','marco','Romagnuolo','066002001','0767222222','marcoromag@gmail.com',NULL),('RMGMRC77L13E793','marco','Romagnuolo','066002001','0767222222','marcoromag@gmail.com',NULL);
+/*!40000 ALTER TABLE `cliente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `contratto_noleggio`
+--
+
+DROP TABLE IF EXISTS `contratto_noleggio`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `contratto_noleggio` (
+  `id` varchar(64) NOT NULL,
+  `cliente` varchar(64) NOT NULL,
+  `impiegato` varchar(64) NOT NULL,
+  `data_inizio` date NOT NULL,
+  `data_fine` date DEFAULT NULL,
+  `data_restituzione` date DEFAULT NULL,
+  `stato_restituzione` enum('BUONO','DANNEGGIATO') DEFAULT NULL,
+  `totale_pagato` decimal(10,2) DEFAULT NULL,
+  `termine_noleggio` int(11) NOT NULL,
+  `supporto` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_contratto_noleggio_cliente` (`cliente`),
+  KEY `fk_contratto_noleggio_impiegato` (`impiegato`),
+  KEY `fk_contratto_termine_noleggio` (`termine_noleggio`),
+  CONSTRAINT `fk_contratto_noleggio_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`cod_fiscale`),
+  CONSTRAINT `fk_contratto_noleggio_impiegato` FOREIGN KEY (`impiegato`) REFERENCES `impiegato` (`matricola`),
+  CONSTRAINT `fk_contratto_termine_noleggio` FOREIGN KEY (`termine_noleggio`) REFERENCES `termine_noleggio` (`giorni`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `contratto_noleggio`
+--
+
+LOCK TABLES `contratto_noleggio` WRITE;
+/*!40000 ALTER TABLE `contratto_noleggio` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contratto_noleggio` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `documento_liberatoria`
+--
+
+DROP TABLE IF EXISTS `documento_liberatoria`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `documento_liberatoria` (
+  `id` varchar(64) NOT NULL,
+  `data_sottoscrizione` date NOT NULL,
+  `posizione_archivio` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documento_liberatoria`
+--
+
+LOCK TABLES `documento_liberatoria` WRITE;
+/*!40000 ALTER TABLE `documento_liberatoria` DISABLE KEYS */;
+INSERT INTO `documento_liberatoria` VALUES ('CI00001','2019-12-28',NULL),('CI00002','2019-12-28','terzo cassetto');
+/*!40000 ALTER TABLE `documento_liberatoria` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fornitore`
+--
+
+DROP TABLE IF EXISTS `fornitore`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fornitore` (
+  `id` varchar(64) NOT NULL,
+  `nome` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fornitore`
+--
+
+LOCK TABLES `fornitore` WRITE;
+/*!40000 ALTER TABLE `fornitore` DISABLE KEYS */;
+INSERT INTO `fornitore` VALUES ('CLY','Cattleya'),('COL','Columbia'),('PAR','Paramount'),('ZUD','01 Distribuzione');
+/*!40000 ALTER TABLE `fornitore` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `genere`
+--
+
+DROP TABLE IF EXISTS `genere`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `genere` (
+  `nome` varchar(64) NOT NULL,
+  `descrizione` varchar(255) NOT NULL,
+  PRIMARY KEY (`nome`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `genere`
+--
+
+LOCK TABLES `genere` WRITE;
+/*!40000 ALTER TABLE `genere` DISABLE KEYS */;
+INSERT INTO `genere` VALUES ('azione','Azione'),('horror','Horror');
+/*!40000 ALTER TABLE `genere` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `impiegato`
+--
+
+DROP TABLE IF EXISTS `impiegato`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `impiegato` (
+  `matricola` varchar(64) NOT NULL,
+  `punto_vendita` int(11) NOT NULL,
+  `login` varchar(64) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `tipo` enum('IMPIEGATO','DIRIGENTE') NOT NULL,
+  `nome` varchar(64) NOT NULL,
+  `cognome` varchar(64) NOT NULL,
+  PRIMARY KEY (`matricola`),
+  UNIQUE KEY `un_impiegato_login` (`login`),
+  KEY `fk_impiegato_punto_vendita` (`punto_vendita`),
+  CONSTRAINT `fk_impiegato_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `impiegato`
+--
+
+LOCK TABLES `impiegato` WRITE;
+/*!40000 ALTER TABLE `impiegato` DISABLE KEYS */;
+INSERT INTO `impiegato` VALUES ('MI_2_01',2,'admin_mi_1','password','DIRIGENTE','Admin','Admin'),('RM_1_01',1,'admin_rm_1','password','DIRIGENTE','Admin','Admin');
+/*!40000 ALTER TABLE `impiegato` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `interpretazione`
+--
+
+DROP TABLE IF EXISTS `interpretazione`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `interpretazione` (
+  `attore` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `ruolo` varchar(255) NOT NULL,
+  PRIMARY KEY (`attore`,`video`),
+  KEY `fk_interpretazione_video` (`video`),
+  CONSTRAINT `fk_interpretazione_attore` FOREIGN KEY (`attore`) REFERENCES `attore` (`id`),
+  CONSTRAINT `fk_interpretazione_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `interpretazione`
+--
+
+LOCK TABLES `interpretazione` WRITE;
+/*!40000 ALTER TABLE `interpretazione` DISABLE KEYS */;
+/*!40000 ALTER TABLE `interpretazione` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `prenotazione`
+--
+
+DROP TABLE IF EXISTS `prenotazione`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `prenotazione` (
+  `cliente` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  PRIMARY KEY (`cliente`,`video`),
+  KEY `fk_prenotazione_video` (`video`),
+  CONSTRAINT `fk_prenotazione_cliente` FOREIGN KEY (`cliente`) REFERENCES `cliente` (`cod_fiscale`),
+  CONSTRAINT `fk_prenotazione_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `prenotazione`
+--
+
+LOCK TABLES `prenotazione` WRITE;
+/*!40000 ALTER TABLE `prenotazione` DISABLE KEYS */;
+/*!40000 ALTER TABLE `prenotazione` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `punto_vendita`
+--
+
+DROP TABLE IF EXISTS `punto_vendita`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `punto_vendita` (
+  `id` int(11) NOT NULL,
+  `citta` varchar(255) NOT NULL,
+  `indirizzo` varchar(255) NOT NULL,
+  `cap` varchar(5) NOT NULL,
+  `direzione` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `punto_vendita`
+--
+
+LOCK TABLES `punto_vendita` WRITE;
+/*!40000 ALTER TABLE `punto_vendita` DISABLE KEYS */;
+INSERT INTO `punto_vendita` VALUES (1,'Roma','Via Masala 42','00148',NULL),(2,'Milano','Via Montenapoleone 2','20001',NULL),(3,'Portici','Via Libertà 216B','80055',NULL),(4,'Roma','Via Merulana 5','00100',NULL),(5,'Terni','Via sailcazzo','1',NULL),(6,'Latina','Via sailcazzo','2',NULL),(7,'Frosinone','Via Sailcazzo','3',NULL),(8,'Roma','Viale Marconi 50','00141',NULL);
+/*!40000 ALTER TABLE `punto_vendita` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `supporto`
+--
+
+DROP TABLE IF EXISTS `supporto`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `supporto` (
+  `seriale` varchar(64) NOT NULL,
+  `video` varchar(64) NOT NULL,
+  `fornitore` varchar(64) NOT NULL,
+  `punto_vendita` int(11) NOT NULL,
+  `data_carico` date NOT NULL,
+  `data_scarico` date DEFAULT NULL,
+  `disponibile` tinyint(1) NOT NULL DEFAULT '1',
+  `stato_fisico` enum('BUONO','DANNEGGIATO') NOT NULL DEFAULT 'BUONO',
+  `costo_supporto` decimal(10,2) DEFAULT NULL,
+  `noleggio_corrente` bigint(20) DEFAULT NULL,
+  `id` varchar(32) NOT NULL,
+  PRIMARY KEY (`seriale`,`fornitore`,`punto_vendita`,`data_carico`),
+  KEY `fk_supporto_video` (`video`),
+  KEY `fk_supporto_fornitore` (`fornitore`),
+  KEY `fk_supporto_punto_vendita` (`punto_vendita`),
+  CONSTRAINT `fk_supporto_fornitore` FOREIGN KEY (`fornitore`) REFERENCES `fornitore` (`id`),
+  CONSTRAINT `fk_supporto_punto_vendita` FOREIGN KEY (`punto_vendita`) REFERENCES `punto_vendita` (`id`),
+  CONSTRAINT `fk_supporto_video` FOREIGN KEY (`video`) REFERENCES `video` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `supporto`
+--
+
+LOCK TABLES `supporto` WRITE;
+/*!40000 ALTER TABLE `supporto` DISABLE KEYS */;
+INSERT INTO `supporto` VALUES ('SER','VID_01','COL',1,'2019-12-23',NULL,1,'BUONO',50.00,NULL,''),('SER0001','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0002','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0003','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0004','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0005','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0006','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0008','VID_02','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0009','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER0010','VID_01','COL',1,'2019-12-28',NULL,1,'BUONO',10.50,NULL,''),('SER1','VID_01','COL',1,'2019-12-23',NULL,1,'BUONO',50.00,NULL,'');
+/*!40000 ALTER TABLE `supporto` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `termine_noleggio`
+--
+
+DROP TABLE IF EXISTS `termine_noleggio`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `termine_noleggio` (
+  `giorni` int(11) NOT NULL,
+  `importo_iniziale` decimal(10,2) NOT NULL,
+  `importo_gg_successivi` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`giorni`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `termine_noleggio`
+--
+
+LOCK TABLES `termine_noleggio` WRITE;
+/*!40000 ALTER TABLE `termine_noleggio` DISABLE KEYS */;
+INSERT INTO `termine_noleggio` VALUES (3,5.00,1.75),(4,6.00,1.50),(5,6.50,1.25);
+/*!40000 ALTER TABLE `termine_noleggio` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `video`
+--
+
+DROP TABLE IF EXISTS `video`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `video` (
+  `id` varchar(64) NOT NULL,
+  `genere` varchar(64) NOT NULL,
+  `tipo` enum('DISPONIBILE','NON-DISPONIBILE') NOT NULL,
+  `titolo` varchar(255) NOT NULL,
+  `regista` varchar(255) NOT NULL,
+  `casa_produttrice` varchar(255) NOT NULL,
+  `data_disponibilita` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_video_genere` (`genere`),
+  CONSTRAINT `fk_video_genere` FOREIGN KEY (`genere`) REFERENCES `genere` (`nome`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `video`
+--
+
+LOCK TABLES `video` WRITE;
+/*!40000 ALTER TABLE `video` DISABLE KEYS */;
+INSERT INTO `video` VALUES ('VID_01','azione','DISPONIBILE','Matrix','Wachowsky','Columbia',NULL),('VID_02','azione','DISPONIBILE','Matrix Reloaded','Wachowsky','Columbia',NULL);
+/*!40000 ALTER TABLE `video` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-12-28 21:07:35
