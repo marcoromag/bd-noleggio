@@ -23,8 +23,8 @@ class RicercaClientePerNomeHandler extends ApiHandler {
         if (!isset($_GET['nome']) && !isset($_GET['cognome'])) {
             throw new Exception ("Specificare almeno uno tra 'nome' e 'cognome'");
         }
-        $nome=$_GET['nome'];
-        $cognome=$_GET['cognome'];
+        $nome=isset($_GET['nome']) ? $_GET['nome'] : '';
+        $cognome=isset($_GET['cognome']) ? $_GET['cognome'] : '';
 
         $db = DB::instance();
         $esito = $db->selezionaClientiPerNome($nome, $cognome);

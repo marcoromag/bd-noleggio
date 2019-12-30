@@ -10,6 +10,7 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { BatchScarico } from './pages/BatchScarico';
 import { BatchCarico } from './pages/BatchCarico';
 import { RicercaPerTitolo } from './pages/RicercaPerTitolo';
+import { Noleggio } from './pages/Noleggio';
 
 
 function App() {
@@ -29,6 +30,9 @@ function App() {
         </PrivateRoute>
         <PrivateRoute path="/ricerca/titolo">
           <RicercaPerTitolo/>
+        </PrivateRoute>
+        <PrivateRoute path="/noleggio">
+          <Noleggio/>
         </PrivateRoute>
       </Layout>
     </GlobalContextProvider>

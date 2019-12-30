@@ -115,7 +115,7 @@ class DB {
         where nome like ? and cognome like ?
         '
         );
-        $stmt->bind_param('sd',$nomeLike, $cognomeLike);
+        $stmt->bind_param('ss',$nomeLike, $cognomeLike);
 
         return $this->fetch_all($stmt);
     }

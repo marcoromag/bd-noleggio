@@ -9,7 +9,10 @@ export interface Video {
     casa_produttrice: string,
     data_disponibilita?: string
     quantita_disponibile: number
+}
 
+export interface Supporto {
+    id: string
 }
 
 export interface SupportoCarico {
@@ -32,9 +35,17 @@ const ricercaPerGenere = async (genere: string) => {
     return response.json() as Promise<Video[]>
 }
 
+const listaSupporti = async (video: string) =>  {
+    const response = await apifetch(`/video/${video}/supporti`, {
+        method:'GET',
+    })
+    return response.json() as Promise<Supporto[]>
+}
+
 export default {
     ricercaPerTitolo,
-    ricercaPerGenere
+    ricercaPerGenere,
+    listaSupporti
 }
 
 

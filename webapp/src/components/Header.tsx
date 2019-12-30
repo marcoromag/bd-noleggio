@@ -48,9 +48,8 @@ export const Header : React.FC = () => {
                     <Link to="/cliente/nuovo">Crea nuovo cliente</Link>
                 </DropdownItem>
                 <DropdownItem divider/>
-                <DropdownItem>
-                    <Link to="/noleggio/attiva">Crea contratto di noleggio</Link>
-                </DropdownItem>
+                <RoutedDropdownItem href="/noleggio">Crea contratto di noleggio</RoutedDropdownItem>
+                <DropdownItem divider/>
                 <DropdownItem>
                     <Link to="/ricerca/genere">Termina contratto di noleggio</Link>
                 </DropdownItem>
