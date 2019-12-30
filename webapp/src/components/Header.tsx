@@ -18,6 +18,9 @@ export const Header : React.FC = () => {
         }
     },[setLogin])
 
+    const isAdmin = login.isLoggedIn && login.user && login.user.tipo === 'DIRIGENTE';
+    const isOper = login.isLoggedIn && login.user;
+
     return <Navbar color="light" light expand="md">
         <NavbarBrand><i className="fas fa-cat fa-3x"></i></NavbarBrand>
         <NavbarToggler onClick={toggle} />
@@ -26,7 +29,7 @@ export const Header : React.FC = () => {
             <NavItem>
               <RoutedNavLink href="/components">Components</RoutedNavLink>
             </NavItem>
-            <UncontrolledDropdown nav inNavbar>
+            {isOper && <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Ricerca</DropdownToggle>
               <DropdownMenu right>
                 <RoutedDropdownItem href="/ricerca/titolo">Ricerca per titolo</RoutedDropdownItem>
@@ -34,6 +37,8 @@ export const Header : React.FC = () => {
                 <RoutedDropdownItem href="/ricerca/genere">Ricerca per genere</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
+            }
+            {isOper && 
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
                 Noleggio
@@ -51,6 +56,8 @@ export const Header : React.FC = () => {
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
+            }
+            {isAdmin && 
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Batch</DropdownToggle>
               <DropdownMenu right>
@@ -61,19 +68,20 @@ export const Header : React.FC = () => {
                 <RoutedDropdownItem href="/batch/carico">Mostra tutte le attività batch</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
+            }
           </Nav>
-          {login.isLoggedIn && 
+          {isOper && 
           <Nav navbar>
-              <UncontrolledDropdown nav inNavbar>
-              <DropdownToggle nav caret>
-              <i className="far fa-user-circle"></i>{login.user!.nome} {login.user!.cognome}
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem onClick={logoutClick}>Log out</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-            </Nav>
-              }
+            <UncontrolledDropdown nav inNavbar>
+            <DropdownToggle nav caret>
+            <i className="far fa-user-circle"></i>{login.user!.nome} {login.user!.cognome}
+            </DropdownToggle>
+            <DropdownMenu right>
+            <DropdownItem onClick={logoutClick}>Log out</DropdownItem>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+          </Nav>
+          }
         </Collapse>
       </Navbar>
 }
