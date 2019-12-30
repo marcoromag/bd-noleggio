@@ -15,7 +15,7 @@ import { RicercaPerTitolo } from './pages/RicercaPerTitolo';
 function App() {
   return (
 
-    <Router>
+    <Router basename="/noleggio/webapp">
     <GlobalContextProvider>
       <Layout>
         <Route exact path="/login">
