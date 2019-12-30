@@ -231,7 +231,7 @@ class DB {
         $result->batch_id=$batchId;
         $result->tipo = $batch['tipo'];
         $result->esito = $batch['esito'];
-        if ($result->esito == 'ERRORE') $result->errore = $batch['errore'];
+        if ($result->esito == 'FALLITO') $result->errore = $batch['errore'];
         $result->punto_vendita = $batch['punto_vendita'];
         $result->impiegato = $batch['impiegato'];
         $result->data = $batch['data'];
@@ -247,6 +247,33 @@ class DB {
         ');
         $select_batch->bind_param("i",$punto_vendita);
         return  $this->fetch_all($select_batch);
+    }
+
+    function listaFornitori() {
+        $select= $this->prepare_statement('listaFornitori',
+        'select id, nome
+         from fornitore
+         order by nome
+        ');
+        return  $this->fetch_all($select);
+    }
+
+    function listaGeneri() {
+        $select= $this->prepare_statement('listaGeneri',
+        'select nome, descrizione
+         from genere
+         order by descrizione
+        ');
+        return  $this->fetch_all($select);
+    }
+
+    function listaTerminiNoleggio() {
+        $select= $this->prepare_statement('listaTerminiNoleggio',
+        'select giorni, importo_iniziale, importo_gg_successivi
+         from termine_noleggio
+         order by giorni
+        ');
+        return  $this->fetch_all($select);
     }
 
     function aggiornaBatchSuccesso($batchId) {
