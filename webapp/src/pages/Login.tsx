@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Form, FormGroup, Label, Input, Container, Row, Col, Button} from 'reactstrap'
-import styles from './Login.module.css'
+import { FormGroup, Label, Input, Container, Row, Col, Button, Card, CardBody, CardTitle} from 'reactstrap'
 import LoginAPI from '../api/LoginAPI';
 import { useLogin } from '../GlobalContext';
 import { useHistory } from 'react-router';
@@ -18,7 +17,7 @@ export const Login: React.FC = () => {
         try {
             const user = await LoginAPI.login(login.utente, login.password);
             setLoginCtx({isLoggedIn:true, user});
-            history.push("/private");
+            history.push("/");
         } catch (e) {
             setLoginCtx({isLoggedIn:false});
             setError (e.message);
@@ -37,26 +36,28 @@ export const Login: React.FC = () => {
 
     const buttonDisabled = !login.utente || !login.password;
 
-    
 
     return (
     <Container fluid>
         <Row>
-            <Col xs="12" sm="6">
-                <Form className={styles.form}>
-                    <DisplayError error={error}/>
-                    <FormGroup >
-                        <Label for="nomeUtente">Nome utente</Label>
-                        <Input type="email" name="user" id="nomeUtente" onChange={changeUser}/>
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="password">Password</Label>
-                        <Input type="password" name="password" id="password" onChange={changePassword}/>
-                    </FormGroup>
-                    <FormGroup>
-                        <Button disabled={buttonDisabled} color="primary" onClick={runLogin}>Accedi</Button>                    
-                    </FormGroup>
-                </Form>
+            <Col sm="9" md="7" lg="5" className="mx-auto my-5">
+                <Card>
+                    <CardBody>
+                        <CardTitle><h5>Log In</h5></CardTitle>
+                        <DisplayError error={error}/>
+                        <FormGroup >
+                            <Label for="nomeUtente">Nome utente</Label>
+                            <Input type="email" name="user" id="nomeUtente" onChange={changeUser}/>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="password">Password</Label>
+                            <Input type="password" name="password" id="password" onChange={changePassword}/>
+                        </FormGroup>
+                        <FormGroup>
+                            <Button disabled={buttonDisabled} color="primary" onClick={runLogin}>Accedi</Button>                    
+                        </FormGroup>
+                    </CardBody>
+                </Card>
             </Col>
         </Row>
     </Container>

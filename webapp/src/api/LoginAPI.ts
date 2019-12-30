@@ -17,7 +17,7 @@ const login = async (utente: string, password: string) => {
     return response.json() as Promise<User>;
 }
 const logout = async () => {
-    await apifetch('/utente/lotgou', {
+    await apifetch('/utente/logout', {
         method:'POST'
     });
 }

@@ -4,7 +4,7 @@ import {GlobalContextProvider} from './GlobalContext'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 import './App.css';
-import { Menu } from './components/Menu';
+
 import { Login } from './pages/Login';
 import { PrivateRoute } from './components/PrivateRoute';
 import { BatchScarico } from './pages/BatchScarico';
@@ -17,17 +17,14 @@ function App() {
 
     <Router>
     <GlobalContextProvider>
-      <Layout menu={<Menu/>}>
+      <Layout>
         <Route exact path="/login">
           <Login/>
         </Route>
-        <PrivateRoute path="/private">
-        <BatchScarico></BatchScarico>
-        </PrivateRoute>
-        <PrivateRoute path="/dirigente/batch/scarico">
+        <PrivateRoute path="/batch/scarico">
           <BatchScarico/>
         </PrivateRoute>
-        <PrivateRoute path="/dirigente/batch/carico">
+        <PrivateRoute path="/batch/carico">
           <BatchCarico/>
         </PrivateRoute>
         <PrivateRoute path="/ricerca/titolo">
