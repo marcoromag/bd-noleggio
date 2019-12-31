@@ -11,6 +11,8 @@ import { BatchScarico } from './pages/BatchScarico';
 import { BatchCarico } from './pages/BatchCarico';
 import { RicercaPerTitolo } from './pages/RicercaPerTitolo';
 import { Noleggio } from './pages/Noleggio';
+import { TerminaNoleggio } from './pages/TerminaNoleggio';
+import { StatisticheDipendente } from './pages/StatisticheDipendente';
 
 
 function App() {
@@ -31,9 +33,13 @@ function App() {
         <PrivateRoute path="/ricerca/titolo">
           <RicercaPerTitolo/>
         </PrivateRoute>
-        <PrivateRoute path="/noleggio">
+        <PrivateRoute path="/noleggio/attiva">
           <Noleggio/>
         </PrivateRoute>
+        <PrivateRoute path="/noleggio/termina">
+          <TerminaNoleggio/>
+        </PrivateRoute>
+        <Route path="/statistiche/dipendente"><StatisticheDipendente/></Route>
       </Layout>
     </GlobalContextProvider>
     </Router>

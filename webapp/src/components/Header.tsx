@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useLogin } from '../GlobalContext';
 import { Nav, NavItem, Navbar, NavbarBrand, NavbarToggler, UncontrolledDropdown, DropdownToggle, DropdownItem, DropdownMenu, Collapse } from 'reactstrap';
-import { Link } from 'react-router-dom';
 import { RoutedNavLink, RoutedDropdownItem } from './RoutedNav';
 import LoginAPI from '../api/LoginAPI';
 
@@ -44,15 +43,11 @@ export const Header : React.FC = () => {
                 Noleggio
               </DropdownToggle>
               <DropdownMenu right>
-                <DropdownItem>
-                    <Link to="/cliente/nuovo">Crea nuovo cliente</Link>
-                </DropdownItem>
+                <RoutedDropdownItem href="/nuovocliente">Nuovo cliente</RoutedDropdownItem>
                 <DropdownItem divider/>
-                <RoutedDropdownItem href="/noleggio">Crea contratto di noleggio</RoutedDropdownItem>
+                <RoutedDropdownItem href="/noleggio/attiva">Crea contratto di noleggio</RoutedDropdownItem>
                 <DropdownItem divider/>
-                <DropdownItem>
-                    <Link to="/ricerca/genere">Termina contratto di noleggio</Link>
-                </DropdownItem>
+                <RoutedDropdownItem href="/noleggio/termina">Termina contratto di noleggio</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }

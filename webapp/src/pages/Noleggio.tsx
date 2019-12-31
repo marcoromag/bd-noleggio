@@ -1,70 +1,15 @@
 import * as React from 'react'
-import { Container, Row, Col, Form, FormGroup, Input, Label, Button, Table, CardHeader, Card, CardBody } from 'reactstrap';
+import { Container, Row, Col, Button, Table, CardHeader, Card, CardBody } from 'reactstrap';
 import { DisplayError } from '../components/DisplayError';
 import VideoAPI, { Video, Supporto } from '../api/VideoAPI';
-import ClienteAPI, { Cliente } from '../api/ClienteAPI';
+import { Cliente } from '../api/ClienteAPI';
 import ConfigAPI, { TermineNoleggio } from '../api/ConfigAPI';
 import { Loading } from '../components/Loading';
 import NoleggioAPI from '../api/NoleggioAPI';
 import { SelezionaVideoPerTitolo } from '../components/SelezionaVideoPerTitolo';
+import { SelezionaCliente } from '../components/SelezionaCliente';
+import { MostraCliente, MostraVideo, MostraTermineNoleggio, MostraSupporto } from '../components/MostraDati';
 
-const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void}> = ({onSelect}) => {
-
-    const [query, setQuery] = React.useState({nome:'', cognome:''});
-    const [listaClienti, setListaClienti] = React.useState<Cliente[]>()
-    const changeNome = React.useCallback( (e : React.ChangeEvent<HTMLInputElement>) => setQuery({...query, nome: e.target.value}), [query])
-    const changeCognome = React.useCallback( (e : React.ChangeEvent<HTMLInputElement>) => setQuery({...query, cognome: e.target.value}), [query])
-    const startBatch = React.useCallback( async ()=>{
-        const lista = await ClienteAPI.ricerca(query.nome, query.cognome);
-        setListaClienti(lista);
-    },[query])
-
-return <>
-    <Col xs="12">
-        <Form>
-            <FormGroup>
-                <Label>Cognome</Label>
-                <Input type="text" onChange={changeNome}/>
-            </FormGroup>
-            <FormGroup>
-                <Label>Nome</Label>
-                <Input type="text" onChange={changeCognome}/>
-            </FormGroup>
-            <FormGroup>
-                <Button disabled={!query.nome && !query.cognome } onClick={startBatch}>Avvia esecuzione</Button>
-            </FormGroup>
-        </Form>
-    </Col>
-    {listaClienti && 
-    <Col xs="12">
-        <Table>
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Cognome</th>
-                    <th>Codice fiscale</th>
-                    <th>Telefono abitazione</th>
-                    <th>Telefono cellulare</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {listaClienti.map( c => 
-                    <tr key={c.cod_fiscale}>
-                        <td>{c.nome}</td>
-                        <td>{c.cognome}</td>
-                        <td>{c.cod_fiscale}</td>
-                        <td>{c.telefono_abitazione}</td>
-                        <td>{c.telefono_cellulare}</td>
-                        <td><Button onClick={() => onSelect(c)}>Seleziona</Button></td>
-                    </tr>
-                )}
-            </tbody>
-        </Table>
-    </Col>
-    }
-    </>
-}
 
 const SelezionaSupporto: React.FC<{video: string, onSelect: (supporto: Supporto) => void}> = ({video,onSelect}) => {
     const [listaSupporti, setListaSupporti] = React.useState<Supporto[]>();
@@ -123,65 +68,16 @@ const SelezionaTermineNoleggio : React.FC<{onSelect: (tn: TermineNoleggio) => vo
         : <Loading/>
 }
 
-const MostraTermineNoleggio : React.FC<{termine: TermineNoleggio}> = ({termine}) => {
-    return <Col xs="4">
-        <Card>
-            <CardHeader>
-                <h5>Termine di noleggio</h5>
-            </CardHeader>
-            <CardBody>
-            {termine.giorni} giorni
-            </CardBody>
-        </Card>
-    </Col>    
-}
 
-const MostraCliente: React.FC<{cliente: Cliente}> =({cliente}) => {
-    return <Col xs="4">
-        <Card>
-            <CardHeader>
-                <h5>Cliente</h5>
-            </CardHeader>
-            <CardBody>
-                {cliente.cognome} {cliente.nome}
-            </CardBody>
-        </Card>
-    </Col>
-}
-
-const MostraVideo: React.FC<{video: Video}> =({video}) => {
-    return <Col xs="4">
-        <Card>
-            <CardHeader>
-                <h5>Video</h5>
-            </CardHeader>
-            <CardBody>
-            {video.titolo}
-            </CardBody>
-        </Card>
-    </Col>
-}
-
-const MostraSupporto: React.FC<{supporto: Supporto}> =({supporto}) => {
-    return <Col xs="4">
-        <Card>
-            <CardHeader>
-                <h5>Supporto</h5>
-            </CardHeader>
-            <CardBody>
-            {supporto.id}
-            </CardBody>
-        </Card>
-    </Col>
-}
 
 const MostraDati: React.FC<{cliente?: Cliente, video?: Video, supporto?: Supporto, termine?: TermineNoleggio}> = ({cliente, video, supporto, termine}) => {
-    return <Row>
-        {cliente && <MostraCliente cliente={cliente}/>}
-        {video && <MostraVideo video={video}/>}
-        {supporto && <MostraSupporto supporto={supporto}/>}
-        {termine && <MostraTermineNoleggio termine={termine}/>}
+    return (cliente || video || supporto || termine) ? <Row className="bg-warning p-3 align-items-stretch mb-4">
+        {cliente && <Col xs="12" sm="4"><MostraCliente cliente={cliente}/></Col>}
+        {video && <Col xs="12" sm="4"><MostraVideo video={video}/></Col>}
+        {supporto && <Col xs="12" sm="4"><MostraSupporto supporto={supporto}/></Col>}
+        {termine && <Col xs="12" sm="4"><MostraTermineNoleggio termine={termine}/></Col>}
     </Row>
+    : null
 }
 
 const titoloStep = [

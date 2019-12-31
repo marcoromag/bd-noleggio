@@ -37,7 +37,7 @@ export const VideoView : React.FC<{video: Video, onSelect? : (video: Video) => v
         </Col>
         </Row>
         </CardBody>
-        </Card>
+    </Card>
 }
 
 
@@ -59,17 +59,21 @@ export const SelezionaVideoPerTitolo : React.FC<{onSelect? : (video: Video) => v
     },[titolo])
 
     return <>
-        <Col xs="12" sm="8">
+        <Col xs="12">
             <DisplayError error={error}/>
-            <FormGroup>
-                <Label>Titolo</Label>
-                <Input type="text" onChange={changeTitolo}/>
-            </FormGroup>
-        </Col>
-        <Col xs="12" sm="4">
-            <FormGroup>
-                <Button disabled={!titolo} onClick={search}>Cerca</Button>
-            </FormGroup>
+            <Row>
+                <Col xs="12" sm>
+                    <FormGroup>
+                        <Label>Titolo</Label>
+                        <Input type="text" onChange={changeTitolo}/>
+                    </FormGroup>
+                </Col>
+                <Col xs="12" sm="auto" className="d-flex align-items-end">
+                    <FormGroup>
+                        <Button disabled={!titolo} onClick={search}>Cerca</Button>
+                    </FormGroup>
+                </Col>
+            </Row>
         </Col>
         <Col xs="12">
             {risultato && risultato.map (v => <VideoView key={v.id} video={v} onSelect={onSelect}/>)}

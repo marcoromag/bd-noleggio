@@ -179,6 +179,22 @@ class DB {
         return $this->fetch_all($stmt);
     }
 
+    function selezionaNoleggiAttiviPerCliente($cod_fiscale, $punto_vendita) {
+        $stmt = $this->prepare_statement ('selezionaNoleggiAttiviPerCliente',
+        'select contratto_noleggio.id,supporto,cliente,impiegato,data_inizio, data_fine, termine_noleggio, video.id as video, titolo
+        from cliente 
+        join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
+        join supporto on supporto.id = contratto_noleggio.supporto
+        join video on video.id = supporto.video
+        where contratto_noleggio.data_restituzione is NULL
+        and cod_fiscale = ?
+        and supporto.punto_vendita=?
+        ');
+        $stmt->bind_param("sd",$cod_fiscale, $punto_vendita);
+        return $this->fetch_all($stmt);
+;
+    }
+
     function ricercaCatalogoPerTitolo($punto_vendita,$parteTitolo) {
         $titoloLike = '%'.$parteTitolo.'%';
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
@@ -574,6 +590,20 @@ class DB {
             $this->conn->rollback();
             throw $e;
         } 
+    }
+
+    function statisticaPerDipendenti ($giorno) {
+        $select= $this->prepare_statement('statisticaPerDipendenti',
+        'select impiegato.punto_vendita, matricola, nome, cognome, ifnull(sum(totale_pagato),0) as totale_incasso, count(contratto_noleggio.id) as num_noleggi
+        from impiegato
+        left join contratto_noleggio 
+             on contratto_noleggio.impiegato = impiegato.matricola 
+             and data_restituzione = str_to_date(?,\'%Y-%m-%d\')
+        group by matricola
+        order by punto_vendita, totale_incasso
+        ');
+        $select->bind_param("s",$giorno);
+        return  $this->fetch_all($select);
     }
 
 }
