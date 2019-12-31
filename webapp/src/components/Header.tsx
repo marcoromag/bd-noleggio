@@ -25,9 +25,6 @@ export const Header : React.FC = () => {
         <NavbarToggler onClick={toggle} />
        <Collapse isOpen={isOpen} navbar>
           <Nav className="mr-auto" navbar>
-            <NavItem>
-              <RoutedNavLink href="/components">Components</RoutedNavLink>
-            </NavItem>
             {isOper && <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Ricerca</DropdownToggle>
               <DropdownMenu right>
