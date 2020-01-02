@@ -1,5 +1,5 @@
 create database noleggio;
-use database noleggio;
+use noleggio;
 
 create or replace table punto_vendita (
   id int not null, 

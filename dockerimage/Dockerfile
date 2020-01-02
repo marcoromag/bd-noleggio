@@ -13,7 +13,7 @@ RUN sed -i 's/bind-address/#bind-address/' /etc/mysql/my.cnf; \
     sed -i s/^bind-address.*/bind-address\ =\ 0.0.0.0/g  /etc/mysql/mariadb.conf.d/50-server.cnf
 
 # Include supervisor configuration
-ADD supervisor-lamp.conf /etc/supervisor/conf.d/
+ADD supervisor-lamp.confroot /etc/supervisor/conf.d/
 ADD supervisord.conf /etc/supervisor/
 
 #activate mod_rewrite
@@ -26,6 +26,14 @@ RUN echo 'Include /etc/phpmyadmin/apache.conf' >> /etc/apache2/apache2.conf
 
 # Create new MariaDB admin user
 RUN service mysql start; mysql -u root -e "CREATE USER 'admin'@'%' IDENTIFIED BY 'pass';";mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;"; 
+
+# Create database
+ADD build/db /tmp/db
+RUN service mysql start; cd /tmp/db; ./create_db.sh; rm -fr /tmp/db
+
+#Add web part
+ADD build/html/noleggio /usr/share/noleggio
+ADD build/html/apache.conf /etc/apache2/conf-enabled/noleggio.conf
 
 # Allow ports
 EXPOSE 80 3306

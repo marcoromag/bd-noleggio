@@ -14,7 +14,7 @@ $username = "admin";
 $password = "pass";
 
 // Crea la connessione
-DB::start($servername, $username, $password, "noleggio2");
+DB::start($servername, $username, $password, "noleggio");
 
 $controller = new ApiController('/noleggio/api');
 $controller->eseguiRichiesta();
