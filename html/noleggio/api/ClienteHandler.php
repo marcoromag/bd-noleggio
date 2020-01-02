@@ -71,7 +71,7 @@ class InserisciDocumentoHandler extends ApiHandler {
 }
 
 class SelezionaNoleggiAttiviPerClienteHandler extends ApiHandler {
-    static $pathRegexp = '@^/cliente/([^/]+)/noleggi@';
+    static $pathRegexp = '@^/cliente/([^/]+)/noleggi$@';
 
     function autorizza ($utente) { return $utente; }
     function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
@@ -88,9 +88,28 @@ class SelezionaNoleggiAttiviPerClienteHandler extends ApiHandler {
     }
 }
 
+class SelezionaNoleggiTerminatiPerClienteHandler extends ApiHandler {
+    static $pathRegexp = '@^/cliente/([^/]+)/noleggi-terminati$@';
+
+    function autorizza ($utente) { return $utente; }
+    function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $data) {
+
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene un cliente");
+        }
+        $cod_fiscale = $match[1];
+        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+
+        $db = DB::instance();
+        return $db->selezionaNoleggiTerminatiPerCliente($cod_fiscale,$punto_vendita);
+    }
+}
+
 
 ApiController::registraHandler(new RicercaClientePerCodFiscaleHandler);
 ApiController::registraHandler(new RicercaClientePerNomeHandler);
 ApiController::registraHandler(new CreaClienteHandler);
 ApiController::registraHandler(new InserisciDocumentoHandler);
 ApiController::registraHandler(new SelezionaNoleggiAttiviPerClienteHandler);
+ApiController::registraHandler(new SelezionaNoleggiTerminatiPerClienteHandler);

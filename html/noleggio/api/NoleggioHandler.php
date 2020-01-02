@@ -19,7 +19,7 @@ class CreaNoleggioHandler extends ApiHandler {
 }
 
 class TerminaNoleggioHandler extends ApiHandler {
-    static $pathRegexp = '@^/noleggio/([^/]+)@';
+    static $pathRegexp = '@^/noleggio/([^/]+)$@';
 
     function autorizza ($utente) { return $utente; }
     function gestisce($path, $method) { return $method == 'POST' && preg_match(self::$pathRegexp,$path); }
@@ -36,9 +36,54 @@ class TerminaNoleggioHandler extends ApiHandler {
 
         $data_restituzione = isset($input->data_restituzione) ? $input->data_restituzione : date('Y-m-d');
         $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+        $matricola = $_SESSION['UTENTE']['matricola'];
 
         $db = DB::instance();
-        $id_noleggio = $db->terminaNoleggio($punto_vendita, $noleggio, $input->stato, $data_restituzione);
+        $id_noleggio = $db->terminaNoleggio($punto_vendita, $matricola, $noleggio, $input->stato, $data_restituzione);
+        return $id_noleggio;
+    }
+}
+
+class InfoNoleggioHandler extends ApiHandler {
+    static $pathRegexp = '@^/noleggio/([^/]+)$@';
+
+    function autorizza ($utente) { return $utente; }
+    function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $input) {
+
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene un ID di noleggio");
+        }
+        $noleggio = $match[1];
+
+        $data_restituzione = isset($input->data_restituzione) ? $input->data_restituzione : date('Y-m-d');
+        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+        $matricola = $_SESSION['UTENTE']['matricola'];
+
+        $db = DB::instance();
+        $id_noleggio = $db->selectNoleggio($punto_vendita, $noleggio);
+        return $id_noleggio;
+    }
+}
+
+class CreaRicevutaHandler extends ApiHandler {
+    static $pathRegexp = '@^/noleggio/([^/]+)/ricevuta$@';
+
+    function autorizza ($utente) { return $utente; }
+    function gestisce($path, $method) { return $method == 'POST' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $input) {
+
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene un ID di noleggio");
+        }
+        $noleggio = $match[1];
+
+        $data_ricevuta = isset($input->data_ricevuta) ? $input->data_ricevuta : date('Y-m-d');
+        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+        $matricola = $_SESSION['UTENTE']['matricola'];
+
+        $db = DB::instance();
+        $id_noleggio = $db->creaRicevuta($punto_vendita, $matricola, $noleggio, $data_ricevuta);
         return $id_noleggio;
     }
 }
@@ -47,3 +92,4 @@ class TerminaNoleggioHandler extends ApiHandler {
 
 ApiController::registraHandler(new CreaNoleggioHandler);
 ApiController::registraHandler(new TerminaNoleggioHandler);
+ApiController::registraHandler(new CreaRicevutaHandler);

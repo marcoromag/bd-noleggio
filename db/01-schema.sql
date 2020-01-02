@@ -145,8 +145,10 @@ create or replace table contratto_noleggio (
 create or replace table ricevuta (
 	numero_ricevuta varchar(36) not null, 
 	impiegato varchar(36) not null, 
+	data date not null,
 	contratto_noleggio varchar(36) not null,
 	CONSTRAINT pk_ricevuta PRIMARY key (numero_ricevuta),
+	CONSTRAINT uk_contratto_noleggio UNIQUE key (contratto_noleggio),
 	CONSTRAINT fk_ricevuta_impiegato FOREIGN key (impiegato) REFERENCES impiegato(matricola),
 	CONSTRAINT fk_ricevuta_contratto_noleggio FOREIGN key (contratto_noleggio) REFERENCES contratto_noleggio(id)
 );
@@ -156,7 +158,8 @@ create or replace table voce_ricevuta(
 	ordine int, 
 	descrizione varchar(255), 
 	costo numeric(10,2),
-	CONSTRAINT pk_voce_ricevuta PRIMARY key (ricevuta, ordine)
+	CONSTRAINT pk_voce_ricevuta PRIMARY key (ricevuta, ordine),
+	CONSTRAINT fk_voce_ricevuta_ricevuta FOREIGN key (ricevuta) REFERENCES ricevuta(numero_ricevuta)
 );
 
 create or replace table interpretazione(
@@ -185,16 +188,16 @@ create or replace table prenotazione(
 	CONSTRAINT fk_prenotazione_cliente foreign key (cliente) references cliente(cod_fiscale)
 );
 
-
 INSERT INTO `punto_vendita` (`id`, nome, `citta`, `indirizzo`, `cap`) VALUES
 (1, 'Roma 1', 'Roma', 'Via Masala 42', '00148'),
 (2, 'Milano 1', 'Milano', 'Via Montenapoleone 2', '20001'),
 (3, 'Portici', 'Portici', 'Via Libertà 216B', '80055'),
 (4, 'Roma 2', 'Roma', 'Via Merulana 5', '00100'),
-(5, 'Terni', 'Terni', 'Via sailcazzo', '1'),
-(6, 'Latina', 'Latina', 'Via sailcazzo', '2'),
-(7, 'Frosinone', 'Frosinone', 'Via Sailcazzo', '3'),
+(5, 'Terni', 'Terni', 'Via Longhi', '1'),
+(6, 'Latina', 'Latina', 'Via Verdi', '2'),
+(7, 'Frosinone', 'Frosinone', 'Via Acquaforte', '3'),
 (8, 'Roma 3', 'Roma', 'Viale Marconi 50', '00141');
+
 INSERT INTO `impiegato` (`matricola`, `punto_vendita`, `login`, `password`, `tipo`, `nome`, `cognome`) VALUES
 ('RM_1_01', 1, 'admin_rm_1', 'password', 'DIRIGENTE', 'Luigi', 'Mario'),
 ('RM_1_02', 1, 'mario.rossi', 'password', 'ADDETTO', 'Mario', 'Rossi'),
@@ -211,49 +214,69 @@ INSERT INTO `impiegato` (`matricola`, `punto_vendita`, `login`, `password`, `tip
 ('MI_2_06', 1, 'lucio', 'password', 'ADDETTO', 'Lucio', 'Romagnuolo'),
 ('MI_2_07', 1, 'svevo.alpini', 'password', 'ADDETTO', 'Svevo', 'Alpini')
 ;
+
 INSERT INTO `fornitore` (`id`, `nome`) VALUES
 ('CLY', 'Cattleya'),
 ('RD', 'Rai Distribuzione'),
 ('PAR', 'Paramount Distribuzione'),
 ('ZUD', '01 Distribuzione');
+
 INSERT INTO `termine_noleggio` (`giorni`, `importo_iniziale`, `importo_gg_successivi`) VALUES
 (3, 5.00, 1.75),
 (4, 6.00, 1.50),
 (5, 6.50, 1.25),
 (6, 7, 1);
 
-INSERT INTO genere (nome,descrizione) VALUES 
-('Action','Action')
-,('Adult','Adult')
-,('Adventure','Adventure')
-,('Animation','Animation')
-,('azione','Azione')
-,('Biography','Biography')
-,('Comedy','Comedy')
-,('Crime','Crime')
-,('Documentary','Documentary')
-,('Drama','Drama')
-,('Family','Family')
-,('Fantasy','Fantasy')
-,('Film-Noir','Film-Noir')
-,('Game-Show','Game-Show')
-,('History','History')
-,('Horror','Horror')
-,('horrorz','Horror')
-,('Music','Music')
-,('Musical','Musical')
-,('Mystery','Mystery')
-,('News','News')
-,('Reality-TV','Reality-TV')
-,('Romance','Romance')
-,('Sci-Fi','Sci-Fi')
-,('Short','Short')
-,('Sport','Sport')
-,('Talk-Show','Talk-Show')
-,('Thriller','Thriller')
-,('War','War')
-,('Western','Western')
+
+create view v_statistica_per_impiegato as
+	select impiegato.punto_vendita, matricola, nome, cognome, data, ifnull(sum(costo),0) as totale_incasso
+	from impiegato
+	left join ricevuta 
+		on ricevuta.impiegato = impiegato.matricola 
+	left join voce_ricevuta 
+		on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
+	group by matricola, data
+	order by punto_vendita, matricola, data
+	;
+
+
+create view v_statistica_per_punto_vendita as 
+    select punto_vendita.id, punto_vendita.nome, citta, indirizzo, cap, ifnull(sum(costo),0) as totale_incasso
+    from punto_vendita
+    left join impiegato on impiegato.punto_vendita = punto_vendita.id
+	left join ricevuta 
+		on ricevuta.impiegato = impiegato.matricola 
+	left join voce_ricevuta 
+	on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
+    group by punto_vendita.id, data
+    order by punto_vendita.id,  totale_incasso, data
+;
+    
+create or replace view v_contratto_noleggio_attivo as
+	select contratto_noleggio.id,supporto,cliente,impiegato_creazione,data_inizio, termine_noleggio, video.id as video, titolo
+    from cliente 
+    join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
+    join supporto on supporto.id = contratto_noleggio.supporto
+    join video on video.id = supporto.video
+    where contratto_noleggio.data_restituzione is NULL
 ;
 
+create or replace view v_contratto_noleggio_terminato as 
+	select contratto_noleggio.id,supporto, punto_vendita, cliente,impiegato,data_inizio, data_restituzione, termine_noleggio, video.id as video, titolo, ricevuta.numero_ricevuta as ricevuta
+        from cliente 
+        join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
+        join supporto on supporto.id = contratto_noleggio.supporto
+        join video on video.id = supporto.video
+        left join ricevuta on ricevuta.contratto_noleggio = contratto_noleggio.id
+        where contratto_noleggio.data_restituzione is not NULL
+;
 
+create or replace view v_supporto_disponibile as 
+	select *
+     from supporto
+     where stato_fisico='BUONO' 
+     and noleggio_corrente is null 
+     and batch_scarico is null
+;
 
+     

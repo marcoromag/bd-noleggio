@@ -96,7 +96,7 @@ class DB {
 
     function selezionaPuntoVendita($id) {
         $stmt = $this->prepare_statement ('selezionaPuntoVendita',
-        'select citta, indirizzo, cap '.
+        'select nome, citta, indirizzo, cap '.
         'from punto_vendita '. 
         'where id=?'
         );
@@ -171,9 +171,9 @@ class DB {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
-        left join catalogo on catalogo.video = video.id
+        join catalogo on catalogo.video = video.id
         where video.genere = ? 
-        and (catalogo.punto_vendita = ? or catalogo.punto_vendita is null)'
+        and catalogo.punto_vendita = ?'
         );
         $stmt->bind_param("si",$genere, $punto_vendita);
         return $this->fetch_all($stmt);
@@ -181,14 +181,22 @@ class DB {
 
     function selezionaNoleggiAttiviPerCliente($cod_fiscale, $punto_vendita) {
         $stmt = $this->prepare_statement ('selezionaNoleggiAttiviPerCliente',
-        'select contratto_noleggio.id,supporto,cliente,impiegato,data_inizio, data_fine, termine_noleggio, video.id as video, titolo
-        from cliente 
-        join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
-        join supporto on supporto.id = contratto_noleggio.supporto
-        join video on video.id = supporto.video
-        where contratto_noleggio.data_restituzione is NULL
-        and cod_fiscale = ?
+        'select id,supporto,cliente,impiegato_creazione,data_inizio, termine_noleggio, video, titolo
+        from v_contratto_noleggio_attivo 
+        where cod_fiscale = ?
         and supporto.punto_vendita=?
+        ');
+        $stmt->bind_param("sd",$cod_fiscale, $punto_vendita);
+        return $this->fetch_all($stmt);
+;
+    }
+
+    function selezionaNoleggiTerminatiPerCliente($cod_fiscale, $punto_vendita) {
+        $stmt = $this->prepare_statement ('selezionaNoleggiTerminatiPerCliente',
+        'select id,supporto,cliente,impiegato,data_inizio, data_restituzione, termine_noleggio, video, titolo, ricevuta
+        from v_contratto_noleggio_terminato 
+        where cliente = ?
+        and punto_vendita=?
         ');
         $stmt->bind_param("sd",$cod_fiscale, $punto_vendita);
         return $this->fetch_all($stmt);
@@ -200,9 +208,9 @@ class DB {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
-        left join catalogo on catalogo.video = video.id 
+        join catalogo on catalogo.video = video.id 
         where MATCH(titolo) AGAINST (? IN NATURAL LANGUAGE MODE) 
-        and (catalogo.punto_vendita = ? or catalogo.punto_vendita is null)'
+        and catalogo.punto_vendita = ?'
         );
         $stmt->bind_param("si",$titoloLike, $punto_vendita);
         return $this->fetch_all($stmt);
@@ -237,9 +245,11 @@ class DB {
         $batch=$this->fetch_single($select_batch);
 
         $select_supporti= $this->prepare_statement('selezionaBatch_supporti',
-        'select id, seriale, video, fornitore, punto_vendita,
-         data_carico, data_scarico, stato_fisico
+        'select supporto.id, seriale, video, fornitore, supporto.punto_vendita,
+         carico.data as data_carico, scarico.data as data_scarico, stato_fisico
          from supporto
+         left join batch as carico on carico.id=batch_carico
+         left join batch as scarico on scarico.id=batch_scarico
          where batch_carico=?
         ');
         $select_supporti->bind_param("s",$batchId);
@@ -332,9 +342,9 @@ class DB {
                 //Crea il supporto
                 $insert_supporto = $this->prepare_statement('caricaSupportiBatch_1',
                 'insert into supporto 
-                    (id,seriale, video, fornitore, punto_vendita, data_carico, data_scarico, disponibile, stato_fisico, costo_supporto, batch_carico)
-                    values(uuid(),?,?,?,?,str_to_date(?,\'%Y-%m-%d\'),null,1,\'BUONO\',?,?)');
-                $insert_supporto->bind_param("sssisds",$el->seriale, $el->video, $fornitore, $punto_vendita, $data, $el->costo_supporto, $batchId);
+                    (id,seriale, video, fornitore, punto_vendita, costo_supporto, batch_carico)
+                    values(uuid(),?,?,?,?,?,?)');
+                $insert_supporto->bind_param("sssids",$el->seriale, $el->video, $fornitore, $punto_vendita, $el->costo_supporto, $batchId);
                 if (!$insert_supporto->execute()) {
                     throw new Exception("Errore alla riga ".$riga." durante l'inserimento: ".$insert_supporto->error);
                 } 
@@ -368,18 +378,18 @@ class DB {
             //esegue lo scarico dei supporti
             $update_supporto = $this->prepare_statement('scaricaSupportiBatch_updateSupporto',
             'update supporto
+             join batch on batch.id=batch_carico
              set
-               data_scarico=str_to_date(?,\'%Y-%m-%d\'),
                batch_scarico=?
              where
-               datediff( str_to_date(?,\'%Y-%m-%d\'), data_carico) >= 90
+               datediff( str_to_date(?,\'%Y-%m-%d\'), batch.data) >= 90
                and noleggio_corrente is null
                and batch_scarico is null
-               and punto_vendita=?
+               and supporto.punto_vendita=?
                and fornitore=?
             ');
 
-            $update_supporto->bind_param("sssis",$data, $batchId, $data, $punto_vendita, $fornitore);
+            $update_supporto->bind_param("ssis", $batchId, $data, $punto_vendita, $fornitore);
             if (!$update_supporto->execute()) {
                 throw new Exception($update_supporto->error);
             } 
@@ -418,9 +428,9 @@ class DB {
 
         $stmt = $this->prepare_statement ('listaSupportiPerVideo',
         'select id
-         from supporto
+         from v_supporto_disponibile
          where video=? and punto_vendita=?
-         and stato_fisico=\'BUONO\' and noleggio_corrente is null and data_scarico is null'
+        '
         );
         $stmt->bind_param("si",$video, $punto_vendita);
         return $this->fetch_all($stmt);
@@ -445,7 +455,11 @@ class DB {
             from supporto
             join catalogo 
               on catalogo.video = supporto.video and catalogo.punto_vendita=supporto.punto_vendita
-            where id=? and data_scarico is null and stato_fisico=\'BUONO\' and noleggio_corrente is null 
+            where 
+              id=? 
+              and batch_scarico is null 
+              and stato_fisico=\'BUONO\' 
+              and noleggio_corrente is null 
             for update');
             $sel_supporto->bind_param('s',$supporto);
             $dati_supporto = $this->fetch_single($sel_supporto);
@@ -456,16 +470,15 @@ class DB {
             $id_noleggio = $this->selectUUID();
 
             $dataInizio= date("Y-m-d");
-            $dataFine=date("Y-m-d", time()+ $termine *24*60*60);
             
             //Crea una nuova entry di noleggio
             $insert_noleggio = $this->prepare_statement('creaNoleggio',
             'insert into contratto_noleggio
-            (id, supporto, cliente, impiegato, data_inizio, data_fine, termine_noleggio)
-            values (?,?,?,?,str_to_date(?,\'%Y-%m-%d\'),str_to_date(?,\'%Y-%m-%d\'),?)'
+            (id, supporto, cliente, impiegato_creazione, data_inizio, termine_noleggio)
+            values (?,?,?,?,str_to_date(?,\'%Y-%m-%d\'),?)'
             );
-            $insert_noleggio->bind_param('sssssss',$id_noleggio, $supporto,
-            $cod_fiscale,$impiegato,$dataInizio, $dataFine, $termine);
+            $insert_noleggio->bind_param('ssssss',$id_noleggio, $supporto,
+            $cod_fiscale, $impiegato, $dataInizio, $termine);
             if (!$insert_noleggio->execute() || $insert_noleggio->affected_rows != 1) {
                 throw new Exception($insert_noleggio->error);
             }
@@ -496,7 +509,7 @@ class DB {
 
     }
 
-    function terminaNoleggio ($punto_vendita, $noleggio, $stato, $dataFine) {
+    function terminaNoleggio ($punto_vendita, $impiegato, $noleggio, $stato, $dataFine) {
         if ($stato != 'BUONO' && $stato != 'DANNEGGIATO')
             throw new Exception ("Stato di restituzione non valido");
 
@@ -521,35 +534,7 @@ class DB {
                 throw new Exception ("Noleggio non trovato o già terminato");
             }
 
-            //selezione il termine di noleggio
-            $termine = $dati_noleggio['termine_noleggio'];
-            $sel_termine = $this->prepare_statement('terminaNoleggio_selTermine',
-            'select importo_iniziale,importo_gg_successivi from termine_noleggio where giorni=?');
-            $sel_termine->bind_param('i',$termine);
-            $dati_termine = $this->fetch_single($sel_termine);
-
-            //calcola l'importo da pagare per il noleggio
-            $timestampFine =  DateTime::createFromFormat("Y-m-d", $dataFine)->getTimestamp();
-            $timestampInizio = DateTime::createFromFormat("Y-m-d", $dati_noleggio['data_inizio'])->getTimestamp();
-            $giorni = ceil (($timestampFine-$timestampInizio) / (24*60*60));
-
-            $importo_iniziale=$dati_termine['importo_iniziale'];
-            $importo_gg_successivi=$dati_termine['importo_gg_successivi'];
-            $importo_noleggio = ($giorni <= $termine) 
-                ? $importo_iniziale 
-                : $importo_iniziale + ($giorni-$termine) * $importo_gg_successivi;
-
-            
-            //calcola l'importo del danno in caso il supporto sia danneggiato
-            $importo_danno = 0;
             $supporto = $dati_noleggio['supporto'];
-            if ($stato == 'DANNEGGIATO') {
-                $sel_supporto = $this->prepare_statement('terminaNoleggio_selSupporto',
-                'select costo_supporto from supporto where id=?');
-                $sel_supporto->bind_param('s',$supporto);
-                $importo_danno = $this->fetch_single($sel_supporto)['costo_supporto'];
-            }
-            $totale_pagato = $importo_noleggio + $importo_danno;
 
             //Libera il supporto dal vincolo del noleggio
             $upd_supporto = $this->prepare_statement('terminaNoleggio_updateSupporto',
@@ -565,11 +550,11 @@ class DB {
              set 
                 data_restituzione=str_to_date(?,\'%Y-%m-%d\'),
                 stato_restituzione=?,
-                totale_pagato=?
+                impiegato_restituzione=?
              where 
                 id=?
             ');
-            $upd_noleggio->bind_param('ssds',$dataFine, $stato, $totale_pagato, $noleggio);
+            $upd_noleggio->bind_param('ssss',$dataFine, $stato, $impiegato, $noleggio);
             if (!$upd_noleggio->execute()) {
                 throw newException ($upd_supporto->error);
             }
@@ -598,16 +583,101 @@ class DB {
         } 
     }
 
+    private function insertRicevuta($impiegato, $noleggio, $data) {
+        $idRicevuta = $this->selectUUID();
+        $stmt_ricevuta = $this->prepare_statement('insertRicevuta',
+        'insert into ricevuta (numero_ricevuta, impiegato, contratto_noleggio, data) 
+        values (?,?,?,str_to_date(?,\'%Y-%m-%d\'))
+        ');
+        $stmt_ricevuta->bind_param('ssss',$idRicevuta, $impiegato, $noleggio, $data);
+        if (!$stmt_ricevuta->execute()) {
+            throw new Exception ($stmt_ricevuta->error);
+        }
+        return $idRicevuta;
+    } 
+
+    private function insertVoceRicevuta($idRicevuta, $ordine, $descrizione, $costo) {
+        $stmt_ricevuta = $this->prepare_statement('insertVoceRicevuta',
+        'insert into voce_ricevuta (ricevuta, ordine, descrizione, costo) 
+        values (?,?,?,?)
+        ');
+        $stmt_ricevuta->bind_param('sdsd',$idRicevuta, $ordine, $descrizione, $costo);
+        if (!$stmt_ricevuta->execute()) {
+            throw newException ($upd_supporto->error);
+        }
+    }
+
+    function creaRicevuta($punto_vendita, $impiegato, $noleggio, $data) {
+        $this->conn->begin_transaction();
+        try {
+            //Seleziona il noleggio ed il supporto for update
+            $sel_noleggio = $this->prepare_statement('creaRicevuta_selNoleggio',
+            'select 
+                contratto_noleggio.supporto, data_inizio, data_restituzione, stato_restituzione,
+                costo_supporto,
+                titolo,
+                termine_noleggio, importo_iniziale, importo_gg_successivi
+            from contratto_noleggio 
+            join supporto on supporto.id = contratto_noleggio.supporto
+            join video on video.id = supporto.video
+            join termine_noleggio on giorni = contratto_noleggio.termine_noleggio
+            where 
+                contratto_noleggio.id=? 
+                and punto_vendita=? 
+                and data_restituzione is not null
+            ');
+
+            $sel_noleggio->bind_param('si',$noleggio,$punto_vendita);
+            $dati_noleggio = $this->fetch_single($sel_noleggio);
+            if (!$dati_noleggio) {
+                throw new Exception ("Noleggio non trovato o già terminato");
+            }
+
+            $supporto = $dati_noleggio['supporto'];
+            $termine = $dati_noleggio['termine_noleggio'];
+            $titolo = $dati_noleggio['titolo'];
+            $stato_restituzione = $dati_noleggio['stato_restituzione'];
+            $data_inizio = $dati_noleggio['data_inizio'];
+            $data_restituzione = $dati_noleggio['data_restituzione'];
+            $costo_supporto = $dati_noleggio['costo_supporto'];
+            $importo_iniziale=$dati_noleggio['importo_iniziale'];
+            $importo_gg_successivi=$dati_noleggio['importo_gg_successivi'];
+
+            //crea la ricevuta
+            $idRicevuta = $this->insertRicevuta($impiegato, $noleggio, $data);
+            $ordine = 0;
+            
+            //calcola l'importo da pagare per il noleggio
+            $timestampInizio = DateTime::createFromFormat("Y-m-d", $data_inizio)->getTimestamp();
+            $timestampRestituzione =  DateTime::createFromFormat("Y-m-d", $data_restituzione)->getTimestamp();
+            $giorni = ceil (($timestampRestituzione-$timestampInizio) / (24*60*60));
+            $importo_noleggio = ($giorni <= $termine) 
+                ? $importo_iniziale 
+                : $importo_iniziale + ($giorni-$termine) * $importo_gg_successivi;
+
+            $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo base del noleggio di "'.$titolo.'" supporto '.$supporto.' (primi '.$termine.' gg)', $importo_iniziale);
+            if ($giorni > $termine) {
+                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo aggiuntivo del noleggio di "'.$titolo.'" supporto '.$supporto.'  (successivi '.($giorni-$termine).' gg)', ($giorni-$termine) * $importo_gg_successivi);
+            }
+            if ($stato_restituzione == 'DANNEGGIATO') {
+                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo danneggiamento titolo "'.$titolo.'" supporto '.$supporto ,$costo_supporto );
+            }
+            
+            $this->conn->commit();
+
+            return $idRicevuta;
+        } catch(Exception $e) {
+            $this->conn->rollback();
+            throw $e;
+        } 
+    } 
+
     function statisticaPerDipendenti ($giorno) {
 
         $select= $this->prepare_statement('statisticaPerDipendenti',
-        'select impiegato.punto_vendita, matricola, nome, cognome, ifnull(sum(totale_pagato),0) as totale_incasso, count(contratto_noleggio.id) as num_noleggi
-        from impiegato
-        left join contratto_noleggio 
-             on contratto_noleggio.impiegato = impiegato.matricola 
-             and data_restituzione = str_to_date(?,\'%Y-%m-%d\')
-        group by matricola
-        order by punto_vendita, totale_incasso
+        'select punto_vendita, matricola, nome, cognome, totale_incasso
+        from v_statistica_per_impiegato
+        where data is null or data = str_to_date(?,\'%Y-%m-%d\')
         ');
         $select->bind_param("s",$giorno);
         return  $this->fetch_all($select);
@@ -615,14 +685,9 @@ class DB {
 
     function statisticaPerPuntoVendita($giorno) {
         $select= $this->prepare_statement('statisticaPerDipendenti',
-        'select punto_vendita.id, citta, indirizzo, cap, ifnull(sum(totale_pagato),0) as totale_incasso, count(contratto_noleggio.id) as num_noleggi
-        from punto_vendita
-        left join impiegato on impiegato.punto_vendita = punto_vendita.id
-        left join contratto_noleggio 
-             on contratto_noleggio.impiegato = impiegato.matricola
-             and data_restituzione = str_to_date(?,\'%Y-%m-%d\')
-        group by punto_vendita.id
-        order by punto_vendita.id, totale_incasso
+        'select id, nome, citta, indirizzo, cap, totale_incasso
+        from v_statistica_per_punto_vendita
+        where data is null or data = str_to_date(?,\'%Y-%m-%d\')
         ');
         $select->bind_param("s",$giorno);
         return  $this->fetch_all($select);
