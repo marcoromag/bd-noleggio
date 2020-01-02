@@ -16,5 +16,22 @@ class StatistichePerAgenteHandler extends ApiHandler {
     }
 }
 
+class StatistichePerPuntoVenditaHandler extends ApiHandler {
+    static $pathRegexp = '@^/statistiche/(\d{4}-\d{2}-\d{2})$@';
+
+    function autorizza ($utente) { return $utente && $utente['tipo'] == 'DIRIGENTE'; }
+    function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $data) { 
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene una data");
+        }
+        $data=$match[1];
+
+        $db = DB::instance();
+        $esito = $db->statisticaPerPuntoVendita($data);
+        return $esito;
+    }
+}
 
 ApiController::registraHandler(new StatistichePerAgenteHandler);
+ApiController::registraHandler(new StatistichePerPuntoVenditaHandler);

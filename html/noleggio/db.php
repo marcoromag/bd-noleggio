@@ -497,6 +497,10 @@ class DB {
     }
 
     function terminaNoleggio ($punto_vendita, $noleggio, $stato, $dataFine) {
+        if ($stato != 'BUONO' && $stato != 'DANNEGGIATO')
+            throw new Exception ("Stato di restituzione non valido");
+
+        $this->conn->begin_transaction();
         try {
             //Seleziona il noleggio ed il supporto for update
             $sel_noleggio = $this->prepare_statement('terminaNoleggio_selNoleggio',
@@ -570,19 +574,21 @@ class DB {
                 throw newException ($upd_supporto->error);
             }
 
-            //aumenta la disponibilità
-            $video = $dati_noleggio['video'];
-            $punto_vendita = $dati_noleggio=['punto_vendita'];
-            $aggiorna_disp = $this->prepare_statement ('terminaNoleggio_aggiorna_disp',
-            'update catalogo 
-             set 
-               quantita_disponibile = quantita_disponibile+1 
-             where 
-               video=? and punto_vendita=?'
-            );
-            $aggiorna_disp->bind_param('si',$video,$punto_vendita);
-            if(!$aggiorna_disp->execute() || $aggiorna_disp->affected_rows != 1) {
-                throw new Exception($aggiorna_disp->error);
+            //aumenta la disponibilità se lo stato del supporto è buono
+            if ($stato == 'BUONO') {
+                $video = $dati_noleggio['video'];
+                $punto_vendita = $dati_noleggio=['punto_vendita'];
+                $aggiorna_disp = $this->prepare_statement ('terminaNoleggio_aggiorna_disp',
+                'update catalogo 
+                 set 
+                   quantita_disponibile = quantita_disponibile+1 
+                 where 
+                   video=? and punto_vendita=?'
+                );
+                $aggiorna_disp->bind_param('si',$video,$punto_vendita);
+                if(!$aggiorna_disp->execute() || $aggiorna_disp->affected_rows != 1) {
+                    throw new Exception($aggiorna_disp->error);
+                }
             }
             $this->conn->commit();
             return $totale_pagato;
@@ -593,6 +599,7 @@ class DB {
     }
 
     function statisticaPerDipendenti ($giorno) {
+
         $select= $this->prepare_statement('statisticaPerDipendenti',
         'select impiegato.punto_vendita, matricola, nome, cognome, ifnull(sum(totale_pagato),0) as totale_incasso, count(contratto_noleggio.id) as num_noleggi
         from impiegato
@@ -606,5 +613,19 @@ class DB {
         return  $this->fetch_all($select);
     }
 
+    function statisticaPerPuntoVendita($giorno) {
+        $select= $this->prepare_statement('statisticaPerDipendenti',
+        'select punto_vendita.id, citta, indirizzo, cap, ifnull(sum(totale_pagato),0) as totale_incasso, count(contratto_noleggio.id) as num_noleggi
+        from punto_vendita
+        left join impiegato on impiegato.punto_vendita = punto_vendita.id
+        left join contratto_noleggio 
+             on contratto_noleggio.impiegato = impiegato.matricola
+             and data_restituzione = str_to_date(?,\'%Y-%m-%d\')
+        group by punto_vendita.id
+        order by punto_vendita.id, totale_incasso
+        ');
+        $select->bind_param("s",$giorno);
+        return  $this->fetch_all($select);
+    }
 }
 ?>
