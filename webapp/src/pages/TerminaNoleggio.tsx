@@ -6,6 +6,8 @@ import { Loading } from '../components/Loading';
 import NoleggioAPI, { NoleggioAttivo, StatoSupporto } from '../api/NoleggioAPI';
 import { SelezionaCliente } from '../components/SelezionaCliente';
 import { MostraCliente, MostraNoleggio } from '../components/MostraDati';
+import { Steps } from '../components/Steps';
+import { Layout } from '../components/Layout';
 
 
 const SelezionaNoleggioPerCliente : React.FC<{cod_fiscale: string, onSelect: (na: NoleggioAttivo) => void}> = ({cod_fiscale,onSelect}) => {
@@ -59,8 +61,8 @@ const SelezionaStatoSupporto : React.FC<{onSelect: (stato: StatoSupporto) => voi
             <Label>Stato del supporto</Label>
             <Input type="select" onChange={changeStato}>   
                 {!stato && <option id="">Seleziona</option>}
-                <option id="BUONO">Buono stato</option>
-                <option id="DANNEGGIATO">Supporto danneggiato</option>
+                <option value="BUONO">Buono stato</option>
+                <option value="DANNEGGIATO">Supporto danneggiato</option>
             </Input>
         </FormGroup>
         <FormGroup>
@@ -71,18 +73,21 @@ const SelezionaStatoSupporto : React.FC<{onSelect: (stato: StatoSupporto) => voi
 }
 
 const MostraDati: React.FC<{cliente?: Cliente, noleggio?: NoleggioAttivo}> = ({cliente, noleggio}) => {
-    return (cliente || noleggio) ? <Row className="bg-warning p-3 align-items-stretch mb-4">
-        {cliente && <Col xs="12" sm="6"><MostraCliente cliente={cliente}/></Col>}
-        {noleggio && <Col xs="12" sm="6"><MostraNoleggio noleggio={noleggio}/></Col>}
-    </Row>
+    return (cliente || noleggio) ?
+    <Col xs="12">
+        <Row className="bg-warning p-3 align-items-stretch mb-4">
+            {cliente && <Col xs="12" sm="6"><MostraCliente cliente={cliente}/></Col>}
+            {noleggio && <Col xs="12" sm="6"><MostraNoleggio noleggio={noleggio}/></Col>}
+        </Row>
+    </Col>
     : null
 }
 
 const titoloStep = [
-    'step 1: seleziona il cliente',
-    'step 2: seleziona il noleggio',
-    'step 3: seleziona lo stato del supporto',
-    'completato'
+    'Seleziona il cliente',
+    'Seleziona il noleggio',
+    'Seleziona lo stato del supporto',
+    'Completato'
 ]
 
 export const TerminaNoleggio : React.FC = () => {
@@ -113,35 +118,24 @@ export const TerminaNoleggio : React.FC = () => {
         }
     },[noleggio]);
 
-  
-    return <Container>
-        <Row>
-            <Col xs="12"><h1>Termina Noleggio {titoloStep[step]}</h1></Col>
-            <Col xs="12">
-                <DisplayError error={error}/>
-            </Col>
-        </Row>
+    //resetta i dati quando si torna indietro
+    React.useEffect( () => {
+        switch (step) {
+            case 0: setCliente(undefined)
+            case 1: setNoleggio(undefined)
+        }
+    },[step])
+
+    return <Layout titolo="Termina noleggio" errore={error}>
+        <Steps steps={titoloStep} corrente={step} stepClick={setStep}/>
         <MostraDati cliente={cliente} noleggio={noleggio}/>
-        {step === 0 && 
-        <Row>
-            <SelezionaCliente onSelect={selezionaCliente}/> 
-        </Row>}
-        {step === 1 && 
-        <Row>
-            <SelezionaNoleggioPerCliente cod_fiscale={cliente!.cod_fiscale} onSelect={selezionaNoleggio}/>
-        </Row>
-        }
-        {step === 2 && 
-        <Row>
-            <SelezionaStatoSupporto onSelect={selezionaStatoSupporto}/>
-        </Row>
-        }
-        {step === 3 && 
-        <Row>
-            <p>Noleggio completato. Costo: {costo}</p>
-        </Row>
-        }
-    </Container>
+        {step === 0 && <SelezionaCliente onSelect={selezionaCliente}/>}
+        {step === 1 && <SelezionaNoleggioPerCliente cod_fiscale={cliente!.cod_fiscale} onSelect={selezionaNoleggio}/> }
+        {step === 2 && <SelezionaStatoSupporto onSelect={selezionaStatoSupporto}/>}
+        {step === 3 && <Col xs="12"><p>Noleggio completato. Costo: {costo}</p></Col>}
+    </Layout>
+  
+
 
 
 }

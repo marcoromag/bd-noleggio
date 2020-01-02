@@ -13,6 +13,8 @@ import { RicercaPerTitolo } from './pages/RicercaPerTitolo';
 import { Noleggio } from './pages/Noleggio';
 import { TerminaNoleggio } from './pages/TerminaNoleggio';
 import { StatisticheDipendente } from './pages/StatisticheDipendente';
+import { Container } from 'reactstrap';
+import { Header } from './components/Header';
 
 
 function App() {
@@ -20,7 +22,8 @@ function App() {
 
     <Router basename="/noleggio/webapp">
     <GlobalContextProvider>
-      <Layout>
+      <Container>
+        <Header/>
         <Route exact path="/login">
           <Login/>
         </Route>
@@ -40,7 +43,7 @@ function App() {
           <TerminaNoleggio/>
         </PrivateRoute>
         <Route path="/statistiche/dipendente"><StatisticheDipendente/></Route>
-      </Layout>
+      </Container>
     </GlobalContextProvider>
     </Router>
   );

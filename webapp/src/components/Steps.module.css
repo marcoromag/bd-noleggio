@@ -1,0 +1,68 @@
+ul.progress-bar{
+    width:100%;
+    margin:0;
+    padding:0;
+    font-size:0;
+    list-style:none
+}
+
+li.section{
+    display:inline-block;
+    padding-top:55px;
+    font-size:13px;
+    font-weight:700;
+    line-height:16px;
+    color:gray;
+    vertical-align:top;
+    position:relative;
+    text-align:center;
+    overflow:hidden;
+    text-overflow:ellipsis
+}
+
+li.section:before{
+    content:'x';
+    position:absolute;
+    top:2px;
+    left:calc(50% - 25px);
+    z-index:1;
+    width:50px;
+    height:50px;
+    color:#fff;
+    border:2px solid #fff;
+    border-radius:25px;
+    line-height:50px;
+    background:gray
+}
+.status-bar{
+    height:2px;
+    background:gray;
+    position:relative;
+    top:30px;
+    margin:0 auto
+}
+
+.current-status{
+    height:2px;
+    width:0;
+    border-radius:1px;
+    background:#3cb371
+}
+@keyframes changeBackground{
+    from{
+        background:gray
+    }
+    to{
+        background:#3cb371
+    }
+}
+
+li.section.visited:before{
+    content:'\2714';
+    animation:changeBackground .5s linear;
+    animation-fill-mode:forwards
+}
+
+li.section.visited.current:before{
+    box-shadow:0 0 0 2px #3cb371
+}

@@ -20,7 +20,7 @@ export const Header : React.FC = () => {
     const isAdmin = login.isLoggedIn && login.user && login.user.tipo === 'DIRIGENTE';
     const isOper = login.isLoggedIn && login.user;
 
-    return <Navbar color="light" light expand="md">
+    return <Navbar color="light" light expand="md" sticky="top">
         <NavbarBrand><i className="fas fa-cat fa-3x"></i></NavbarBrand>
         <NavbarToggler onClick={toggle} />
        <Collapse isOpen={isOpen} navbar>
@@ -57,6 +57,16 @@ export const Header : React.FC = () => {
                 <RoutedDropdownItem href="/batch/scarico">Scarico</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/batch/carico">Mostra tutte le attività batch</RoutedDropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+            }
+            {isAdmin && 
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>Statistiche</DropdownToggle>
+              <DropdownMenu right>
+                <RoutedDropdownItem href="/statistiche/dipendente">Per dipendente del tuo punto vendita</RoutedDropdownItem>
+                <DropdownItem divider />
+                <RoutedDropdownItem href="/statistiche">Per tutti i punti vendita</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }

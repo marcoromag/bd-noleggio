@@ -10,11 +10,17 @@ export interface StatPerDipendente {
 
 }
 
+const isodate = (date: Date) => {
+    const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+    const msLocal =  date.getTime() - offsetMs;
+    const dateLocal = new Date(msLocal);
+    return dateLocal.toISOString().slice(0, 10);
+}
 const perDipendente = async (data: Date) => {
-    const response = await apifetch(`/statistiche/${data.toISOString().slice(0, 10)}/impiegati`, {
+    const response = await apifetch(`/statistiche/${isodate(data)}/impiegati`, {
         method:'GET'
     })
-    return response.json() as Promise<StatPerDipendente>     
+    return response.json() as Promise<StatPerDipendente[]>     
 } 
 
 export default {

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Container, Row, Col, Button, Table, CardHeader, Card, CardBody } from 'reactstrap';
-import { DisplayError } from '../components/DisplayError';
+import {  Row, Col, Button, Table, CardHeader, Card, CardBody, Breadcrumb, BreadcrumbItem } from 'reactstrap';
 import VideoAPI, { Video, Supporto } from '../api/VideoAPI';
 import { Cliente } from '../api/ClienteAPI';
 import ConfigAPI, { TermineNoleggio } from '../api/ConfigAPI';
@@ -9,6 +8,8 @@ import NoleggioAPI from '../api/NoleggioAPI';
 import { SelezionaVideoPerTitolo } from '../components/SelezionaVideoPerTitolo';
 import { SelezionaCliente } from '../components/SelezionaCliente';
 import { MostraCliente, MostraVideo, MostraTermineNoleggio, MostraSupporto } from '../components/MostraDati';
+import { Layout } from '../components/Layout';
+import { Steps } from '../components/Steps';
 
 
 const SelezionaSupporto: React.FC<{video: string, onSelect: (supporto: Supporto) => void}> = ({video,onSelect}) => {
@@ -17,7 +18,7 @@ const SelezionaSupporto: React.FC<{video: string, onSelect: (supporto: Supporto)
         VideoAPI.listaSupporti(video).then (l => {
             setListaSupporti(l);
         });
-    })
+    },[])
 
     return (listaSupporti && listaSupporti.length) ?
         <Col xs="12">
@@ -48,7 +49,7 @@ const SelezionaTermineNoleggio : React.FC<{onSelect: (tn: TermineNoleggio) => vo
         ConfigAPI.listaTermini().then (l => {
             setlistaTerminiNoleggio(l);
         });
-    })
+    },[])
 
     return listaTerminiNoleggio ? <>
         {listaTerminiNoleggio.map(t => 
@@ -71,22 +72,27 @@ const SelezionaTermineNoleggio : React.FC<{onSelect: (tn: TermineNoleggio) => vo
 
 
 const MostraDati: React.FC<{cliente?: Cliente, video?: Video, supporto?: Supporto, termine?: TermineNoleggio}> = ({cliente, video, supporto, termine}) => {
-    return (cliente || video || supporto || termine) ? <Row className="bg-warning p-3 align-items-stretch mb-4">
+    return (cliente || video || supporto || termine) ? 
+    <Col xs="12">
+        <Row className="bg-warning p-3 align-items-stretch mb-4">
         {cliente && <Col xs="12" sm="4"><MostraCliente cliente={cliente}/></Col>}
         {video && <Col xs="12" sm="4"><MostraVideo video={video}/></Col>}
         {supporto && <Col xs="12" sm="4"><MostraSupporto supporto={supporto}/></Col>}
         {termine && <Col xs="12" sm="4"><MostraTermineNoleggio termine={termine}/></Col>}
-    </Row>
+        </Row>
+    </Col>
     : null
 }
 
+
+
 const titoloStep = [
-    'step 1: seleziona il cliente',
-    'step 2: seleziona il video',
-    'step 3: seleziona il supporto',
-    'step 4: seleziona il termine di noleggio',
-    'step 5: conferma i dati di noleggio',
-    'completato'
+    'Seleziona il cliente',
+    'Seleziona il video',
+    'Seleziona il supporto',
+    'Seleziona il termine di noleggio',
+    'Conferma i dati di noleggio',
+    'Completato'
 ]
 
 export const Noleggio : React.FC = () => {
@@ -120,7 +126,15 @@ export const Noleggio : React.FC = () => {
         setStep(4);
     },[]);
 
-
+    //resetta i dati quando si torna indietro
+    React.useEffect( () => {
+        switch (step) {
+            case 0: setCliente(undefined)
+            case 1: setVideo(undefined)
+            case 2: setSupporto(undefined);
+            case 3: setTermineNoleggio(undefined);
+        }
+    },[step])
 
     const confermaNoleggio = React.useCallback( async () => {
         try {
@@ -133,44 +147,16 @@ export const Noleggio : React.FC = () => {
         }
     },[cliente, termineNoleggio, supporto]);
     
-    return <Container>
-        <Row>
-            <Col xs="12"><h1>Noleggio {titoloStep[step]}</h1></Col>
-            <Col xs="12">
-                <DisplayError error={error}/>
-            </Col>
-        </Row>
+    return <Layout titolo="Attiva noleggio" errore={error}>
+        <Steps steps={titoloStep} corrente={step} stepClick={setStep}/>
         <MostraDati cliente={cliente} video={video} supporto={supporto} termine={termineNoleggio}/>
-        {step === 0 && 
-        <Row>
-            <SelezionaCliente onSelect={selezionaCliente}/> 
-        </Row>}
-        {step === 1 && 
-        <Row>
-            <SelezionaVideoPerTitolo onSelect={selezionaVideo}/> 
-        </Row>
-        }
-        {step === 2 && 
-        <Row>
-            <SelezionaSupporto video={video!.id} onSelect={selezionaSupporto}/>
-        </Row>
-        }
-        {step === 3 && 
-        <Row>
-            <SelezionaTermineNoleggio onSelect={selezionaTermineNoleggio}/>
-        </Row>
-        }
-        {step === 4 && 
-        <Row>
-            <Col xs="12"><Button onClick={confermaNoleggio}>Conferma il noleggio</Button></Col>
-        </Row>
-        }
-        {step === 5 && 
-        <Row>
-            <Col xs="12">Noleggio confermato con ID {idNoleggio}</Col>
-        </Row>
-        }
-    </Container>
+        {step === 0 && <SelezionaCliente onSelect={selezionaCliente}/>}
+        {step === 1 && <SelezionaVideoPerTitolo onSelect={selezionaVideo}/> }
+        {step === 2 && <SelezionaSupporto video={video!.id} onSelect={selezionaSupporto}/>}
+        {step === 3 && <SelezionaTermineNoleggio onSelect={selezionaTermineNoleggio}/>}
+        {step === 4 && <Col xs="12"><Button onClick={confermaNoleggio}>Conferma il noleggio</Button></Col>}
+        {step === 5 && <Col xs="12">Noleggio confermato con ID {idNoleggio}</Col>}
+    </Layout>
 
 
 }

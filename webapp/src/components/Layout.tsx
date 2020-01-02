@@ -1,18 +1,24 @@
 import React from 'react'
-import {Container} from 'reactstrap'
-import { Header } from './Header'
+import {Container, Row, Col} from 'reactstrap'
+import { DisplayError } from './DisplayError'
 
 interface LayoutProps {
-    menu? : React.ReactElement
+    titolo?: string
+    errore? : string
 }
 
-export const Layout : React.FC<LayoutProps> = ({children}) => {
+export const Layout : React.FC<LayoutProps> = ({titolo, errore, children}) => {
 
     return (
-        <Container>
-            <Header/>
-            {children}
-        </Container>
+    <Container>
+            <Row>
+                {titolo && <Col xs="12"><h1>{titolo}</h1></Col>}
+                {<Col xs="12"><DisplayError error={errore}/></Col>}
+            </Row>
+            <Row>
+                {children}
+            </Row>
+    </Container>
 
     )
 }

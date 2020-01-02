@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { Row, Col, Table } from 'reactstrap'
+import { Row, Col, Table, Card, CardBody } from 'reactstrap'
 import { Batch } from '../api/BatchAPI'
 
 export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {
-    return <Row>
+    return  <>
             <Col xs="6" sm="3">Batch id</Col>
             <Col xs="6" sm="9">{batch.batch_id}</Col>
 
@@ -47,6 +47,6 @@ export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {
                 </tbody>
             </Table>
             </Col>
-        </Row>
+        </>
         
 }

@@ -13,7 +13,7 @@ export const SelectFornitore : React.FC<InputProps & {onLoadError?: (error: stri
         }).catch(e => {
             onLoadError && onLoadError (e.message);
         })
-    })
+    },[])
 
     return  <Input {...rest} type="select">
         {listaFornitori && listaFornitori.map( f => <option key={f.id} value={f.id}>{f.nome}</option>)}
