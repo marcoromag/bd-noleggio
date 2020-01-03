@@ -21,7 +21,7 @@ li.section{
 }
 
 li.section:before{
-    content:'x';
+    content:'';
     position:absolute;
     top:2px;
     left:calc(50% - 25px);

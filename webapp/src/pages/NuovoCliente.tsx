@@ -3,12 +3,13 @@ import { Layout } from '../components/Layout'
 import { FormGroup, Col, Label, Input, Button } from 'reactstrap';
 import ClienteAPI, { Cliente } from '../api/ClienteAPI';
 import { useHistory } from 'react-router';
+import { InfoMessage } from '../components/Info';
 
 const useInput = (field: keyof Cliente, cliente: Cliente, setCliente: (c: Cliente)=>void) => ({
     value: cliente[field],
     onChange: React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setCliente ({...cliente, [field]:e.target.value});
-    },[cliente])
+    },[cliente, field, setCliente])
 })
 
 export const NuovoCliente : React.FC = () => {
@@ -35,9 +36,16 @@ export const NuovoCliente : React.FC = () => {
         } catch (e) {
             setErrore(e.message)
         }            
-    },[cliente])
+    },[cliente, history])
 
-    return <Layout titolo="Nuovo cliente" errore={errore}>
+    return <Layout titolo="Nuovo cliente" errore={errore}
+        headline={<>Crea un nuovo cliente riempiendo questo form. 
+        Tutti i dati sono mandatori. 
+        Il codice fiscale deve essere unico, altrimenti il cliente non verrà creato.
+        Una volta creato il cliente, verrai indirizzato alla pagina di dettaglio, dove
+        potrai aggiungere il documento di liberatoria 
+        <br/><InfoMessage>Senza documento di liberatoria, il cliente non potrà noleggiare alcun supporto</InfoMessage></>}
+    >
         <Col xs="12">
             <h3>Dati anagrafici</h3>
         </Col>

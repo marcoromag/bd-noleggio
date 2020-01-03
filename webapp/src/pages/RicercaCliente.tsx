@@ -12,7 +12,9 @@ export const RicercaCliente : React.FC = () => {
         history.push(`/cliente/${cliente.cod_fiscale}`)
     },[history])
 
-    return <Layout titolo="Ricerca cliente">
+    return <Layout titolo="Ricerca cliente"
+    headline="Ricerca un cliente per andare alla sua pagina di dettaglio."
+    >
             <SelezionaCliente onSelect={selectCliente} />
     </Layout>
 }

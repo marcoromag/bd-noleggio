@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Col, FormGroup, Input, Label, Button, Table, Row, Card, CardHeader, FormText, CardBody} from 'reactstrap';
+import { Col, FormGroup, Input, Label, Button, Row, Card, CardHeader, FormText, CardBody} from 'reactstrap';
 import ClienteAPI, { Cliente } from '../api/ClienteAPI';
+import { InfoMessage } from './Info';
 
 
-export const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void}> = ({onSelect}) => {
+export const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void, info?:string}> = ({onSelect, info}) => {
 
     const [query, setQuery] = React.useState({nome:'', cognome:''});
     const [listaClienti, setListaClienti] = React.useState<Cliente[]>()
@@ -18,21 +19,18 @@ export const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void}>
     <Col xs="12">
         <Row>
             <Col xs="12" sm="">
-                <FormGroup>
                     <Label>Cognome</Label>
                     <Input type="text" onChange={changeNome}/>
-                </FormGroup>
             </Col>
             <Col xs="12" sm="4">
-                <FormGroup>
                     <Label>Nome</Label>
                     <Input type="text" onChange={changeCognome}/>
-                </FormGroup>
             </Col>
             <Col xs="12" sm="auto" className="d-flex align-items-end">
-                <FormGroup>
-                    <Button disabled={!query.nome && !query.cognome } onClick={ricerca}>Cerca</Button>
-                </FormGroup>
+                 <Button disabled={!query.nome && !query.cognome } onClick={ricerca}>Cerca</Button>
+            </Col>
+            <Col xs="12" className="mb-2">
+                <InfoMessage>{info || 'Per selezionare il cliente, inserisci le iniziali del cognome o del nome, poi premi il tasto Cerca'}</InfoMessage>
             </Col>
         </Row>
     </Col>

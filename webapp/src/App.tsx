@@ -1,8 +1,6 @@
 import React from 'react';
 import {GlobalContextProvider} from './GlobalContext'
-import {BrowserRouter as Router, Route} from 'react-router-dom'
-
-import './App.css';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
 import { Login } from './pages/Login';
 import { PrivateRoute } from './components/PrivateRoute';
@@ -18,6 +16,9 @@ import { DisplayRicevuta } from './pages/DisplayRicevuta';
 import { RicercaCliente } from './pages/RicercaCliente';
 import { DettagliCliente } from './pages/DettagliCliente';
 import { NuovoCliente } from './pages/NuovoCliente';
+import { NotFound } from './pages/NotFound';
+import { Homepage } from './pages/Home';
+import { PrenotaVideo } from './pages/PrenotaVideo';
 
 
 function App() {
@@ -27,18 +28,23 @@ function App() {
     <GlobalContextProvider>
       <Container>
         <Header/>
-        <Route exact path="/login" component={Login}/>
-        <PrivateRoute path="/batch/scarico" component={BatchScarico}/>
-        <PrivateRoute path="/batch/carico" component={BatchCarico}/>
-        <PrivateRoute exact path="/ricerca/titolo" component={RicercaPerTitolo}/>
-        <PrivateRoute exact path="/ricerca/genere" component={RicercaPerGenere}/>
-        <PrivateRoute exact path="/ricerca/cliente" component={RicercaCliente}/>
-        <PrivateRoute path="/noleggio/attiva" component={Noleggio}/>
-        <PrivateRoute path="/noleggio/termina"component={TerminaNoleggio}/>
-        <PrivateRoute path="/ricevuta/:id" render={(props) => <DisplayRicevuta id={props.match.params.id}/>}/>
-        <PrivateRoute path="/nuovo-cliente" component={NuovoCliente}/>
-        <PrivateRoute path="/cliente/:cod_fiscale" render={(props) => <DettagliCliente cod_fiscale={props.match.params.cod_fiscale}/>}/>
-        <PrivateRoute path="/statistiche/dipendente" component={StatisticheDipendente}/>
+        <Switch>
+          <Route exact path="/login" component={Login}/>
+          <PrivateRoute exact path="/" component={Homepage}/>
+          <PrivateRoute path="/batch/scarico" component={BatchScarico}/>
+          <PrivateRoute path="/batch/carico" component={BatchCarico}/>
+          <PrivateRoute exact path="/ricerca/titolo" component={RicercaPerTitolo}/>
+          <PrivateRoute exact path="/ricerca/genere" component={RicercaPerGenere}/>
+          <PrivateRoute exact path="/ricerca/cliente" component={RicercaCliente}/>
+          <PrivateRoute path="/noleggio/attiva" component={Noleggio}/>
+          <PrivateRoute path="/noleggio/termina"component={TerminaNoleggio}/>
+          <PrivateRoute path="/prenotazione"component={PrenotaVideo}/>
+          <PrivateRoute path="/ricevuta/:id" render={(props) => <DisplayRicevuta id={props.match.params.id}/>}/>
+          <PrivateRoute path="/nuovo-cliente" component={NuovoCliente}/>
+          <PrivateRoute path="/cliente/:cod_fiscale" render={(props) => <DettagliCliente cod_fiscale={props.match.params.cod_fiscale}/>}/>
+          <PrivateRoute path="/statistiche/dipendente" component={StatisticheDipendente}/>
+          <Route path="*" component={NotFound}/>
+        </Switch>
       </Container>
     </GlobalContextProvider>
     </Router>

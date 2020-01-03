@@ -21,17 +21,15 @@ export interface SupportoCarico {
     costo_supporto: number
 }
 
-const ricercaPerTitolo = async (titolo: string) => {
-    const response = await apifetch(`/catalogo/ricerca/titolo?titolo=${titolo}`, {
-        method:'GET',
-    })
+const ricercaPerTitolo = async (titolo: string, disponibile: boolean = true) => {
+    const d = disponibile ? 'DISPONIBILE' : 'NON-DISPONIBILE';
+    const response = await apifetch(`/catalogo/ricerca?titolo=${titolo}&tipo=${d}`)
     return response.json() as Promise<Video[]>
 }
 
-const ricercaPerGenere = async (genere: string, pagina: number, size: number) => {
-    const response = await apifetch(`/catalogo/ricerca/genere?genere=${genere}&pagina=${pagina}&size=${size}`, {
-        method:'GET',
-    })
+const ricercaPerGenere = async (genere: string, pagina: number, size: number, disponibile: boolean = true) => {
+    const d = disponibile ? 'DISPONIBILE' : 'NON-DISPONIBILE';
+    const response = await apifetch(`/catalogo/ricerca?genere=${genere}&pagina=${pagina}&size=${size}&tipo=${d}`)
     return response.json() as Promise<Video[]>
 }
 

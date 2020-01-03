@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useLogin } from '../GlobalContext';
-import { Nav, NavItem, Navbar, NavbarBrand, NavbarToggler, UncontrolledDropdown, DropdownToggle, DropdownItem, DropdownMenu, Collapse } from 'reactstrap';
-import { RoutedNavLink, RoutedDropdownItem } from './RoutedNav';
+import { Nav, Navbar, NavbarBrand, NavbarToggler, UncontrolledDropdown, DropdownToggle, DropdownItem, DropdownMenu, Collapse } from 'reactstrap';
+import { RoutedDropdownItem } from './RoutedNav';
 import LoginAPI from '../api/LoginAPI';
 
 export const Header : React.FC = () => {
@@ -26,12 +26,22 @@ export const Header : React.FC = () => {
        <Collapse isOpen={isOpen} navbar>
           <Nav className="mr-auto" navbar>
             {isOper && <UncontrolledDropdown nav inNavbar>
-              <DropdownToggle nav caret>Ricerca</DropdownToggle>
+              <DropdownToggle nav caret>Video</DropdownToggle>
               <DropdownMenu right>
                 <RoutedDropdownItem href="/ricerca/titolo">Ricerca per titolo</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/ricerca/genere">Ricerca per genere</RoutedDropdownItem>
-                <DropdownItem divider />
+              </DropdownMenu>
+            </UncontrolledDropdown>
+            }
+           {isOper && 
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>
+                Cliente
+              </DropdownToggle>
+              <DropdownMenu right>
+                <RoutedDropdownItem href="/nuovo-cliente">Nuovo cliente</RoutedDropdownItem>
+                <DropdownItem divider/>
                 <RoutedDropdownItem href="/ricerca/cliente">Ricerca cliente</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
@@ -42,7 +52,7 @@ export const Header : React.FC = () => {
                 Noleggio
               </DropdownToggle>
               <DropdownMenu right>
-                <RoutedDropdownItem href="/nuovo-cliente">Nuovo cliente</RoutedDropdownItem>
+                <RoutedDropdownItem href="/prenotazione">Prenota un video</RoutedDropdownItem>
                 <DropdownItem divider/>
                 <RoutedDropdownItem href="/noleggio/attiva">Crea contratto di noleggio</RoutedDropdownItem>
                 <DropdownItem divider/>

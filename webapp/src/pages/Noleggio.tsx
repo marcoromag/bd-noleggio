@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {  Row, Col, Button, Table, CardHeader, Card, CardBody, Breadcrumb, BreadcrumbItem, FormGroup, FormText, Label } from 'reactstrap';
+import {  Row, Col, Button, Table, CardHeader, Card, CardBody, FormGroup, FormText, Label } from 'reactstrap';
 import VideoAPI, { Video, Supporto } from '../api/VideoAPI';
 import { Cliente } from '../api/ClienteAPI';
 import ConfigAPI, { TermineNoleggio } from '../api/ConfigAPI';
@@ -7,7 +7,6 @@ import { Loading } from '../components/Loading';
 import NoleggioAPI from '../api/NoleggioAPI';
 import { SelezionaVideoPerTitolo } from '../components/SelezionaVideo';
 import { SelezionaCliente } from '../components/SelezionaCliente';
-import { MostraCliente, MostraVideo, MostraTermineNoleggio, MostraSupporto } from '../components/MostraDati';
 import { Layout } from '../components/Layout';
 import { Steps } from '../components/Steps';
 
@@ -18,7 +17,7 @@ const SelezionaSupporto: React.FC<{video: string, onSelect: (supporto: Supporto)
         VideoAPI.listaSupporti(video).then (l => {
             setListaSupporti(l);
         });
-    },[])
+    },[video])
 
     return (listaSupporti && listaSupporti.length) ?
         <Col xs="12">
@@ -162,12 +161,14 @@ export const Noleggio : React.FC = () => {
         }
     },[cliente, termineNoleggio, supporto]);
     
-    return <Layout titolo="Attiva noleggio" errore={error}>
-        <Steps steps={titoloStep} corrente={step} stepClick={setStep}/>
+    return <Layout titolo="Attiva noleggio" errore={error}
+        headline="Da questa pagina potrai attivare un nuovo noleggio. Segui gli step indicati sotto, fino al completamento. Alla fine del processo riceverai il codice del noleggio attivato"
+    >
+        <Steps xs="12" className="mb-4" steps={titoloStep} corrente={step} stepClick={setStep}/>
         <Col xs="8" sm="8">
             <Row>
             {step === 0 && <SelezionaCliente onSelect={selezionaCliente}/>}
-            {step === 1 && <SelezionaVideoPerTitolo onSelect={selezionaVideo}/> }
+            {step === 1 && <SelezionaVideoPerTitolo onSelect={selezionaVideo} conDisponibilita="DISPONIBILE" /> }
             {step === 2 && <SelezionaSupporto video={video!.id} onSelect={selezionaSupporto}/>}
             {step === 3 && <SelezionaTermineNoleggio onSelect={selezionaTermineNoleggio}/>}
             {step === 4 && <Col xs="12"><Button onClick={confermaNoleggio}>Conferma il noleggio</Button></Col>}

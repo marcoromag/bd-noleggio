@@ -82,11 +82,8 @@ class StampaRicevutaHandler extends ApiHandler {
         return $db->selezionaRicevuta($ricevuta);
     }
 }
- 
-
- 
-
 
 ApiController::registraHandler(new CreaNoleggioHandler);
 ApiController::registraHandler(new TerminaNoleggioHandler);
 ApiController::registraHandler(new StampaRicevutaHandler);
+

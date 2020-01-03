@@ -1,0 +1,11 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+.ricevuta h5 {
+    margin-top: map-get($spacers,3);
+}
+
+.ricevuta h6 {
+    color: map-get($theme_colors,'primary')
+}

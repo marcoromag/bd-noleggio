@@ -134,13 +134,55 @@ class DB {
 
     function inserisciCliente($cliente) {
         $stmt = $this->prepare_statement ('inserisciCliente',
-        'insert into cliente (cod_fiscale, nome, cognome, telefono_abitazione, telefono_cellulare, email)
-        values (?,?,?,?,?,?)');
-        $stmt->bind_param('ssssss',$cliente->cod_fiscale, $cliente->nome, $cliente->cognome, $cliente->telefono_abitazione, $cliente->telefono_cellulare, $cliente->email);
+        'insert into cliente (cod_fiscale, nome, cognome, indirizzo, citta, cap, telefono_abitazione, telefono_cellulare, email)
+        values (?,?,?,?,?,?,?,?,?)');
+        $stmt->bind_param('sssssssss',$cliente->cod_fiscale, $cliente->nome, $cliente->cognome, $cliente->indirizzo, $cliente->citta, $cliente->cap, $cliente->telefono_abitazione, $cliente->telefono_cellulare, $cliente->email);
         if (!$stmt->execute()) {
             throw new Exception($stmt->error);
         }
         return true;
+    }
+
+    function inserisciPrenotazione($punto_vendita, $cod_fiscale,$video) {
+        $stmt = $this->prepare_statement ('inserisciPrenotazione_check',
+        'select tipo 
+        from video 
+        join catalogo on catalogo.video = video.id 
+        where id=? and catalogo.punto_vendita=?'
+        );
+        $stmt->bind_param('si',$video,$punto_vendita);
+        $tipo = $this->fetch_single($stmt)['tipo'];
+
+        if(!$tipo) {
+            throw new Exception("Video non a catalogo nel punto vendita");
+        }
+
+        if ($tipo == 'DISPONIBILE') {
+            throw new Exception("Prenotazione non effettuata: il video è già disponibile");
+        }
+        
+        $stmt = $this->prepare_statement ('inserisciPrenotazione',
+        'insert into prenotazione (cliente, punto_vendita, video)
+        values (?,?,?)');
+        $stmt->bind_param('sis',$cod_fiscale, $punto_vendita, $video);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
+        return true;
+    }
+
+    function listaVideoPrenotati($punto_vendita, $cod_fiscale) {
+        $stmt = $this->prepare_statement ('listaVideoPrenotati',
+        'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
+        from prenotazione
+        join video on id = prenotazione.video
+        join catalogo on catalogo.video = prenotazione.video and catalogo.punto_vendita = prenotazione.punto_vendita
+        where prenotazione.punto_vendita = ?
+        and prenotazione.cliente = ?
+        group by id
+        ');
+        $stmt->bind_param('ss',$punto_vendita, $cod_fiscale);
+        return $this->fetch_all($stmt);
     }
 
     function inserisciDocumentoLiberatoria($cod_fiscale, $documento) {
@@ -167,18 +209,19 @@ class DB {
         $this->conn->commit();
     }
 
-    function ricercaCatalogoPerGenere($punto_vendita,$genere, $pagina, $size) {
+    function ricercaCatalogoPerGenere($punto_vendita,$genere, $tipo, $pagina, $size) {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
         join catalogo on catalogo.video = video.id
         where video.genere = ? 
         and catalogo.punto_vendita = ?
+        and tipo = ?
         order by id
         limit ?,?'
         );
         $start = $pagina * $size;
-        $stmt->bind_param("siii",$genere, $punto_vendita, $start, $size);
+        $stmt->bind_param("sisii",$genere, $punto_vendita, $tipo, $start, $size);
         return $this->fetch_all($stmt);
     }
 
@@ -206,16 +249,18 @@ class DB {
 ;
     }
 
-    function ricercaCatalogoPerTitolo($punto_vendita,$parteTitolo) {
+    function ricercaCatalogoPerTitolo($punto_vendita,$parteTitolo, $tipo) {
         $titoloLike = '%'.$parteTitolo.'%';
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
         join catalogo on catalogo.video = video.id 
         where MATCH(titolo) AGAINST (? IN NATURAL LANGUAGE MODE) 
-        and catalogo.punto_vendita = ?'
+        and catalogo.punto_vendita = ?
+        and tipo=?
+        '
         );
-        $stmt->bind_param("si",$titoloLike, $punto_vendita);
+        $stmt->bind_param("sis",$titoloLike, $punto_vendita, $tipo);
         return $this->fetch_all($stmt);
     }
 

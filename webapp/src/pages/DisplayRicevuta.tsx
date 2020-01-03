@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Layout } from '../components/Layout';
 import NoleggioAPI, { Ricevuta } from '../api/NoleggioAPI';
-import { Table, Col } from 'reactstrap';
-import { DisplayError } from '../components/DisplayError';
+import { Col } from 'reactstrap';
+import styles from './DisplayRicevuta.module.scss'
 
 export const DisplayRicevuta : React.FC<{id: string}> = ({id}) => {
     const [ricevuta, setRicevuta] = React.useState<Ricevuta>();
@@ -15,47 +15,49 @@ export const DisplayRicevuta : React.FC<{id: string}> = ({id}) => {
     },[id])
 
 
-    return <Layout titolo={`Ricevuta ${id}`} errore={error}>
+    return <Layout titolo={`Ricevuta`} errore={error} className={styles.ricevuta}>
         {ricevuta && <>
+            <Col xs="12">
+                <h5>Dati ricevuta</h5>
+            </Col>
+            <Col xs="4"><h6>Numero ricevuta</h6></Col>
+            <Col xs="8">{id}</Col>
+            <Col xs="4"><h6>Data</h6></Col>
+            <Col xs="8">{}</Col>
+            <Col xs="4"><h6>Totale</h6></Col>
+            <Col xs="8">{ricevuta.totale}</Col>
             <Col xs="12">
                 <h5>Cliente</h5>
             </Col>
-            <Col xs="12">
-                <Table>
-                    <tbody>
-                        <tr>
-                            <th>Cliente</th><td>{ricevuta.nome} {ricevuta.cognome}</td>
-                        </tr>
-                        <tr>
-                            <th>Codice fiscale</th><td>{ricevuta.cliente}</td>
-                        </tr>
-                        <tr>
-                            <th>indirizzo</th><td>{ricevuta.indirizzo}</td>
-                        </tr>
-                        <tr>
-                            <th>città</th><td>{ricevuta.citta}</td>
-                        </tr>
-                        <tr>
-                            <th>cap</th><td>{ricevuta.cap}</td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </Col>
+            <Col xs="4"><h6>Cliente</h6></Col>
+            <Col xs="8">{ricevuta.nome} {ricevuta.cognome}</Col>
+            <Col xs="4"><h6>Codice fiscale</h6></Col>
+            <Col xs="8">{ricevuta.cliente}</Col>
+            <Col xs="4"><h6>Indirizzo></h6></Col>
+            <Col xs="8">{ricevuta.indirizzo}</Col>
+            <Col xs="4"><h6>Città</h6></Col>
+            <Col xs="8">{ricevuta.citta}</Col>
+            <Col xs="4"><h6>CAP</h6></Col>
+            <Col xs="8">{ricevuta.cap}</Col>
             <Col xs="12">
                 <h5>Servito da</h5>
             </Col>
+            <Col xs="4"><h6>Matricola</h6></Col>
+            <Col xs="8">{ricevuta.matricola}</Col>
+            <Col xs="4"><h6>Nome</h6></Col>
+            <Col xs="8">{ricevuta.impiegato_nome} {ricevuta.impiegato_cognome}</Col>
             <Col xs="12">
-                <Table>
-                    <tbody>
-                        <tr>
-                            <th>impiegato</th><td>{ricevuta.impiegato_nome} {ricevuta.impiegato_cognome}</td>
-                        </tr>
-                        <tr>
-                            <th>matricola</th><td>{ricevuta.matricola}</td>
-                        </tr>
-                    </tbody>
-                </Table>
+                <hr/>
             </Col>
+            <Col xs="12">
+                <h5>Dettaglio</h5>
+            </Col>
+            {ricevuta.dettagli.map(d => <>
+                <Col xs="8"><h6>{d.descrizione}</h6></Col>
+                <Col xs="4">{d.costo}</Col>
+            </>
+            )}
+
         </>
         }
     </Layout>

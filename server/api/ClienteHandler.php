@@ -40,6 +40,9 @@ class CreaClienteHandler extends ApiHandler {
         if(!$data->cod_fiscale 
             || !$data->nome 
             || !$data->cognome 
+            || !$data->indirizzo
+            || !$data->citta 
+            || !$data->cap 
             || !$data->telefono_abitazione 
             || !$data->telefono_cellulare 
             || !$data->email) {
@@ -106,6 +109,45 @@ class SelezionaNoleggiTerminatiPerClienteHandler extends ApiHandler {
     }
 }
 
+class CreaPrenotazioneHandler extends ApiHandler {
+    static $pathRegexp = '@^/cliente/([^/]+)/prenotazione/([^/]+)$@';
+
+    function autorizza ($utente) { return $utente; }
+    function gestisce($path, $method) { return $method == 'POST' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $input) {
+
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene un ID di noleggio");
+        }
+        $cliente = $match[1];
+        $video = $match[2];
+        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+
+        $db = DB::instance();
+        return $db->inserisciPrenotazione($punto_vendita,$cliente, $video);
+    }
+}
+
+class ListaPrenotazioniHandler extends ApiHandler {
+    static $pathRegexp = '@^/cliente/([^/]+)/prenotazione$@';
+
+    function autorizza ($utente) { return $utente; }
+    function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
+    function esegui($path, $method, $input) {
+
+        if (!preg_match(self::$pathRegexp,$path,$match)) {
+            throw new Exception ("Il path non contiene un ID di noleggio");
+        }
+        $cliente = $match[1];
+        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
+
+        $db = DB::instance();
+        return $db->listaVideoPrenotati($punto_vendita,$cliente);
+    }
+}
+ 
+ 
+
 
 ApiController::registraHandler(new RicercaClientePerCodFiscaleHandler);
 ApiController::registraHandler(new RicercaClientePerNomeHandler);
@@ -113,3 +155,5 @@ ApiController::registraHandler(new CreaClienteHandler);
 ApiController::registraHandler(new InserisciDocumentoHandler);
 ApiController::registraHandler(new SelezionaNoleggiAttiviPerClienteHandler);
 ApiController::registraHandler(new SelezionaNoleggiTerminatiPerClienteHandler);
+ApiController::registraHandler(new CreaPrenotazioneHandler);
+ApiController::registraHandler(new ListaPrenotazioniHandler);

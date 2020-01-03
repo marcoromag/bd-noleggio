@@ -1,13 +1,9 @@
 import * as React from 'react'
-import { Container, Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap'
+import { Col, Button, Form, FormGroup, Label, Input } from 'reactstrap'
 import BatchAPI, { Batch, SupportoCarico } from '../api/BatchAPI'
-import { DisplayError } from '../components/DisplayError'
 import { BatchView } from '../components/BatchView'
 import { SelectFornitore } from '../components/SelectFornitore'
 import { Layout } from '../components/Layout'
-import { number } from 'prop-types'
-
-
 
 const creaListaBatch = (lista: string) => {
     const entries = lista.split('\n');

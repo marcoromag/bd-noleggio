@@ -4,7 +4,6 @@ import { Cliente } from '../api/ClienteAPI';
 import { Loading } from '../components/Loading';
 import NoleggioAPI, { Noleggio, StatoSupporto } from '../api/NoleggioAPI';
 import { SelezionaCliente } from '../components/SelezionaCliente';
-import { MostraCliente, MostraNoleggio } from '../components/MostraDati';
 import { Steps } from '../components/Steps';
 import { Layout } from '../components/Layout';
 import { useHistory } from 'react-router';
@@ -148,7 +147,7 @@ export const TerminaNoleggio : React.FC = () => {
     },[step])
 
     return <Layout titolo="Termina noleggio" errore={error}>
-        <Steps steps={titoloStep} corrente={step} stepClick={setStep}/>
+        <Steps xs="12" className="mb-4" steps={titoloStep} corrente={step} stepClick={setStep}/>
         
         <Col xs="8" sm="8">
             <Row>

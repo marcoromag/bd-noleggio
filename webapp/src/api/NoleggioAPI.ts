@@ -1,4 +1,5 @@
 import apifetch from "./api-fetch"
+import { Video } from "./VideoAPI"
 
 
 export interface Noleggio {
@@ -83,11 +84,28 @@ const noleggiTerminatiPerCliente = async (cod_fiscale:string) => {
     return response.json() as Promise<Noleggio[]>    
 }
 
+const prenotazioniPerCliente = async (cod_fiscale:string) => {
+    const response = await apifetch(`/cliente/${cod_fiscale}/prenotazione`, {
+        method:'GET'
+    })
+    return response.json() as Promise<Video[]>    
+}
+
+const prenotazione = async (cod_fiscale:string, id_video: string) => {
+    const response = await apifetch(`/cliente/${cod_fiscale}/prenotazione/${id_video}`, {
+        method:'POST',
+    })
+    return response.json() as Promise<boolean>    
+}
+
+
 
 export default {
     attiva,
     termina,
     ricevuta,
     noleggiAttiviPerCliente,
-    noleggiTerminatiPerCliente
+    noleggiTerminatiPerCliente,
+    prenotazioniPerCliente,
+    prenotazione
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Row, Col, Table, Card, CardBody } from 'reactstrap'
+import { Col, Table } from 'reactstrap'
 import { Batch } from '../api/BatchAPI'
 
 export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {

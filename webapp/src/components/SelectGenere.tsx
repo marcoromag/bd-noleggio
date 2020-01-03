@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Input, InputProps } from 'reactstrap'
-import ConfigAPI, { Fornitore, Genere } from '../api/ConfigAPI';
+import ConfigAPI, { Genere } from '../api/ConfigAPI';
 
 
 

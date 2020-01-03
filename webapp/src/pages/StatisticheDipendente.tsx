@@ -14,16 +14,17 @@ export const StatisticaPerDipendenteView : React.FC<{stats: StatPerDipendente[]}
                     <th>Punto vendita</th>
                     <th>Matricola</th>
                     <th>Nome</th>
-                    <th>Numero noleggi</th>
+                    <th>Cognome</th>
                     <th>Totale incasso</th>
                 </tr>
             </thead>
             <tbody>
                 {stats.map( s => 
                     <tr key={s.punto_vendita}>
+                        <td>{s.punto_vendita}</td>
                         <td>{s.matricola}</td>
-                        <td>{s.cognome} {s.nome}</td>
-                        <td>{s.num_noleggi}</td>
+                        <td>{s.nome}</td>
+                        <td>{s.cognome}</td>
                         <td>{s.totale_incasso}</td>
                     </tr>
                 )}

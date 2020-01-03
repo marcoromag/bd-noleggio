@@ -5,6 +5,9 @@ import { Layout } from '../components/Layout';
 import { Col, FormGroup, FormText, Label, Button, Alert, Input } from 'reactstrap';
 import DatePicker from 'react-date-picker';
 import { useHistory } from 'react-router';
+import styles from './DettagliCliente.module.scss'
+import { Video } from '../api/VideoAPI';
+import { VideoView } from '../components/SelezionaVideo';
 
 
 const MostraNoleggio : React.FC<{noleggio: Noleggio}> = ({noleggio}) => {
@@ -97,7 +100,7 @@ export const CreaDocumentoLiberatoria : React.FC<{cliente: Cliente, setError?: (
         } catch (e) {
             setError && setError (e.message)
         }
-    },[cliente, idDoc, posizione, dataSottoscrizione, setError])
+    },[cliente, idDoc, posizione, dataSottoscrizione, setError, onDocumento])
 
 
 
@@ -136,6 +139,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
     const [errore, setErrore] = React.useState<string>();
     const [noleggiAttivi, setNoleggiAttivi] = React.useState<Noleggio[]>();
     const [noleggiTerminati, setNoleggiTerminati] = React.useState<Noleggio[]>();
+    const [prenotazioni, setPrenotazioni] = React.useState<Video[]>();
 
     const caricaCliente = React.useCallback( async () => {
         try {
@@ -145,30 +149,33 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
         } catch (e) {
             setErrore(e.message)
         }
-    },[cliente])
+    },[cod_fiscale])
 
-    React.useEffect( () => {caricaCliente()},[cod_fiscale]);
+    React.useEffect( () => {caricaCliente()},[caricaCliente]);
 
     React.useEffect( () => {
         if(! cliente) {
             setNoleggiAttivi(undefined);
             setNoleggiTerminati(undefined);
+            setPrenotazioni(undefined);
             return;
         }
         Promise.all([
             NoleggioAPI.noleggiAttiviPerCliente(cliente.cod_fiscale),
-            NoleggioAPI.noleggiTerminatiPerCliente(cliente.cod_fiscale)
-        ]).then (([attivi,terminati]) => {
+            NoleggioAPI.noleggiTerminatiPerCliente(cliente.cod_fiscale),
+            NoleggioAPI.prenotazioniPerCliente(cliente.cod_fiscale)
+        ]).then (([attivi,terminati, prenotati]) => {
             setNoleggiAttivi(attivi)
             setNoleggiTerminati(terminati)
+            setPrenotazioni(prenotati)
         }).catch(e => {setErrore(e.message)})
       
     },[cliente])
 
-    return <Layout titolo="Dettagli cliente" errore={errore}>
+    return <Layout titolo="Dettagli cliente" errore={errore} className={styles.cliente}>
         {cliente && <>
         <Col xs="12">
-            <h4>Dati anagratici</h4>
+            <h4>Dati anagrafici</h4>
         </Col>
         <Col xs="6" sm="4">
             <FormGroup>
@@ -207,7 +214,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
                 <Label>{cliente.cap}</Label>
             </FormGroup>
         </Col>
-        <Col xs="12">
+        <Col xs="12" className="mt-4">
             <h4>Dati di contatto</h4>
         </Col>
         <Col xs="6" sm="4">
@@ -228,7 +235,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
                 <Label>{cliente.email}</Label>
             </FormGroup>
         </Col>
-        <Col xs="12">
+        <Col xs="12" className="mt-4">
             <h4>Documento di liberatoria</h4>
         </Col>
         {cliente.data_sottoscrizione ? 
@@ -236,7 +243,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
         : 
             <CreaDocumentoLiberatoria cliente={cliente} setError={setErrore} onDocumento={caricaCliente}/>
         }
-        <Col xs="12">
+        <Col xs="12" className="mt-4">
             <h4>Noleggi attivi</h4>
         </Col>
 
@@ -247,7 +254,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
             </Col>
         }
 
-        <Col xs="12">
+        <Col xs="12" className="mt-4">
             <h4>Noleggi terminati</h4>
         </Col>
         {noleggiTerminati && noleggiTerminati.length ?
@@ -256,6 +263,15 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
                 <Alert>Nessun noleggio terminato</Alert>
             </Col>
         }
+                <Col xs="12" className="mt-4">
+            <h4>Prenotazioni</h4>
+            {prenotazioni && prenotazioni.length ?
+                prenotazioni.map(v => <VideoView key={v.id} video={v}/>)  
+                :<Col xs="12">
+                    <Alert>Nessuna prenotazione attiva</Alert>
+                </Col>
+        }
+        </Col>
     </>
     }
     </Layout>

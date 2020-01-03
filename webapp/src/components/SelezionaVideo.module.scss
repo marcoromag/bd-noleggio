@@ -1,0 +1,15 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+.disponibile {
+    border-left: 8px solid map-get($theme-colors,'success' );
+}
+
+.nondisponibile {
+    border-left: 8px solid map-get($theme-colors,'danger' );
+}
+
+.prenotabile {
+    border-left:  8px solid map-get($theme-colors,'warning' );
+}

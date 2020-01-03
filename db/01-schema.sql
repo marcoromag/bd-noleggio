@@ -183,8 +183,9 @@ create or replace table catalogo(
 create or replace table prenotazione(
 	cliente varchar(16) not null,
 	video varchar(36) not null,
-	CONSTRAINT pk_prenotazione primary key (cliente, video),
-	CONSTRAINT fk_prenotazione_video foreign key (video) REFERENCES video(id),
+	punto_vendita int not null,
+	CONSTRAINT pk_prenotazione primary key (cliente, video, punto_vendita),
+	CONSTRAINT fk_prenotazione_catalogo foreign key (video,punto_vendita) REFERENCES catalogo(video,punto_vendita),
 	CONSTRAINT fk_prenotazione_cliente foreign key (cliente) references cliente(cod_fiscale)
 );
 
@@ -297,4 +298,14 @@ create or replace view v_supporto_disponibile as
      and batch_scarico is null
 ;
 
-     
+insert into video(id, genere, titolo, tipo, regista, casa_produttrice, data_disponibilita)
+values 
+('new-joker','Drama','Joker','NON-DISPONIBILE','non lo ricordo','Warner Bros','2020-02-16');
+
+update video set tipo='NON-DISPONIBILE' where id in ('tt7286456', 'tt4520988','tt0000417','tt0002113',
+'tt0005853','tt0000014','tt0000029','tt0000609','tt0026252'
+,'tt0000567','tt0026029','tt0136652','tt0002349','tt0021232','tt0021232','tt0004374','tt0501313');
+
+insert into catalogo(video, punto_vendita) values 
+('new-joker',1),
+('new-joker',2)
