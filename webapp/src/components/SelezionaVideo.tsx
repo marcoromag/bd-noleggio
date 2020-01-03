@@ -20,7 +20,9 @@ export const VideoView : React.FC<{video: Video, onSelect? : (video: Video) => v
             <Row>
                 <Col xs>
                     <h5>{video.titolo}</h5>
-                    <h6>Quantità disponibile: <strong>{video.quantita_disponibile}</strong></h6>
+                    {video.tipo === 'DISPONIBILE' ?
+                        <h6>Quantità disponibile: <strong>{video.quantita_disponibile}</strong></h6>
+                        :<h6>In uscita il {video.data_disponibilita}</h6>}
                 </Col>
                 <Col xs="auto">
                     {onSelect && <Button className="ml-auto" onClick={onClick}>Seleziona</Button>}

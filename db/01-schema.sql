@@ -208,12 +208,12 @@ INSERT INTO `impiegato` (`matricola`, `punto_vendita`, `login`, `password`, `tip
 ('RM_1_06', 1, 'marco.romagnuolo', 'password', 'ADDETTO', 'Marco', 'Romagnuolo'),
 ('RM_1_07', 1, 'svevo.svevi', 'password', 'ADDETTO', 'Svevo', 'Svevi'),
 ('MI_2_01', 2, 'admin_mi_1', 'password', 'DIRIGENTE', 'Admin', 'Admin'),
-('MI_2_02', 1, 'mario.bianchi', 'password', 'ADDETTO', 'Mario', 'Bianchi'),
-('MI_2_03', 1, 'luigi.verdi', 'password', 'ADDETTO', 'Luigi', 'Verdi'),
-('MI_2_04', 1, 'andrea.scarpa', 'password', 'ADDETTO', 'Andrea', 'Scarpa'),
-('MI_2_05', 1, 'italo.mora', 'password', 'ADDETTO', 'Italo', 'Mora'),
-('MI_2_06', 1, 'lucio', 'password', 'ADDETTO', 'Lucio', 'Romagnuolo'),
-('MI_2_07', 1, 'svevo.alpini', 'password', 'ADDETTO', 'Svevo', 'Alpini')
+('MI_2_02', 2, 'mario.bianchi', 'password', 'ADDETTO', 'Mario', 'Bianchi'),
+('MI_2_03', 2, 'luigi.verdi', 'password', 'ADDETTO', 'Luigi', 'Verdi'),
+('MI_2_04', 2, 'andrea.scarpa', 'password', 'ADDETTO', 'Andrea', 'Scarpa'),
+('MI_2_05', 2, 'italo.mora', 'password', 'ADDETTO', 'Italo', 'Mora'),
+('MI_2_06', 2, 'lucio', 'password', 'ADDETTO', 'Lucio', 'Romagnuolo'),
+('MI_2_07', 2, 'svevo.alpini', 'password', 'ADDETTO', 'Svevo', 'Alpini')
 ;
 
 INSERT INTO `fornitore` (`id`, `nome`) VALUES
@@ -228,30 +228,6 @@ INSERT INTO `termine_noleggio` (`giorni`, `importo_iniziale`, `importo_gg_succes
 (5, 6.50, 1.25),
 (6, 7, 1);
 
-
-create view v_statistica_per_impiegato as
-	select impiegato.punto_vendita, matricola, nome, cognome, data, ifnull(sum(costo),0) as totale_incasso
-	from impiegato
-	left join ricevuta 
-		on ricevuta.impiegato = impiegato.matricola 
-	left join voce_ricevuta 
-		on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
-	group by matricola, data
-	order by punto_vendita, matricola, data
-	;
-
-
-create view v_statistica_per_punto_vendita as 
-    select punto_vendita.id, punto_vendita.nome, citta, indirizzo, cap, ifnull(sum(costo),0) as totale_incasso
-    from punto_vendita
-    left join impiegato on impiegato.punto_vendita = punto_vendita.id
-	left join ricevuta 
-		on ricevuta.impiegato = impiegato.matricola 
-	left join voce_ricevuta 
-	on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
-    group by punto_vendita.id, data
-    order by punto_vendita.id,  totale_incasso, data
-;
     
 create or replace view v_contratto_noleggio_attivo as
 	select contratto_noleggio.id,supporto, punto_vendita, cliente,impiegato_creazione,data_inizio, termine_noleggio, video.id as video, titolo
@@ -277,7 +253,7 @@ create or replace view v_ricevuta as
 	supporto,
 	titolo, 
 	cliente, cliente.nome, cliente.cognome, indirizzo, citta, cap, 
-	impiegato.nome as impiegato_nome, impiegato.cognome as impiegato_cognome, matricola, 
+	impiegato.nome as impiegato_nome, impiegato.cognome as impiegato_cognome, matricola, impiegato.punto_vendita as punto_vendita,
 	data_inizio, data_restituzione,
 	sum(costo) as totale
 	from ricevuta
@@ -290,6 +266,27 @@ create or replace view v_ricevuta as
 	group by numero_ricevuta 
 ;
 
+create or replace view v_statistica_per_punto_vendita as 
+    select punto_vendita.id, punto_vendita.nome, punto_vendita.citta, punto_vendita.indirizzo, punto_vendita.cap, data, count(numero_ricevuta) as numero_ricevute, ifnull(sum(totale),0) as totale_incasso
+    from punto_vendita
+	left join v_ricevuta 
+		on v_ricevuta.punto_vendita = punto_vendita.id 
+    group by punto_vendita.id, data
+    order by punto_vendita.id,  totale_incasso, data
+;
+
+create or replace view v_statistica_per_impiegato as
+	select impiegato.punto_vendita, punto_vendita.nome as punto_vendita_nome, matricola, impiegato.nome, cognome, data, ifnull(sum(costo),0) as totale_incasso
+	from impiegato
+	join punto_vendita on punto_vendita.id = impiegato.punto_vendita
+	left join ricevuta 
+		on ricevuta.impiegato = impiegato.matricola 
+	left join voce_ricevuta 
+		on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
+	group by matricola, data
+	order by punto_vendita, matricola, data
+	;
+
 create or replace view v_supporto_disponibile as 
 	select *
      from supporto
@@ -298,14 +295,4 @@ create or replace view v_supporto_disponibile as
      and batch_scarico is null
 ;
 
-insert into video(id, genere, titolo, tipo, regista, casa_produttrice, data_disponibilita)
-values 
-('new-joker','Drama','Joker','NON-DISPONIBILE','non lo ricordo','Warner Bros','2020-02-16');
 
-update video set tipo='NON-DISPONIBILE' where id in ('tt7286456', 'tt4520988','tt0000417','tt0002113',
-'tt0005853','tt0000014','tt0000029','tt0000609','tt0026252'
-,'tt0000567','tt0026029','tt0136652','tt0002349','tt0021232','tt0021232','tt0004374','tt0501313');
-
-insert into catalogo(video, punto_vendita) values 
-('new-joker',1),
-('new-joker',2)

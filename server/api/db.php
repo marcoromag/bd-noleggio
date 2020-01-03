@@ -292,14 +292,24 @@ class DB {
         $select_batch->bind_param("s",$batchId);
         $batch=$this->fetch_single($select_batch);
 
-        $select_supporti= $this->prepare_statement('selezionaBatch_supporti',
+        if ($batch['tipo'] === 'CARICO') {
+        $select_supporti= $this->prepare_statement('selezionaBatch_supporti_carico',
         'select supporto.id, seriale, video, fornitore, supporto.punto_vendita,
-         carico.data as data_carico, scarico.data as data_scarico, stato_fisico
+         batch.data as data_carico, batch.data as data_carico, stato_fisico
          from supporto
-         left join batch as carico on carico.id=batch_carico
-         left join batch as scarico on scarico.id=batch_scarico
+         left join batch on carico.id=batch_carico
          where batch_carico=?
         ');
+        } else {
+            $select_supporti= $this->prepare_statement('selezionaBatch_supporti_scarico',
+            'select supporto.id, seriale, video, fornitore, supporto.punto_vendita,
+             carico.data as data_carico, scarico.data as data_scarico, stato_fisico
+             from supporto
+             left join batch as carico on carico.id=batch_carico
+             left join batch as scarico on scarico.id=batch_scarico
+             where batch_scarico=?
+        ');
+        }
         $select_supporti->bind_param("s",$batchId);
         $result = new stdClass;
         $result->batch_id=$batchId;
@@ -750,7 +760,7 @@ class DB {
     function statisticaPerDipendenti ($giorno) {
 
         $select= $this->prepare_statement('statisticaPerDipendenti',
-        'select punto_vendita, matricola, nome, cognome, totale_incasso
+        'select punto_vendita, punto_vendita_nome, matricola, nome, cognome, totale_incasso
         from v_statistica_per_impiegato
         where data is null or data = str_to_date(?,\'%Y-%m-%d\')
         ');
@@ -760,7 +770,7 @@ class DB {
 
     function statisticaPerPuntoVendita($giorno) {
         $select= $this->prepare_statement('statisticaPerDipendenti',
-        'select id, nome, citta, indirizzo, cap, totale_incasso
+        'select id, nome, citta, indirizzo, cap, totale_incasso, numero_ricevute
         from v_statistica_per_punto_vendita
         where data is null or data = str_to_date(?,\'%Y-%m-%d\')
         ');

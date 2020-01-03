@@ -1,38 +1,40 @@
 import * as React from 'react'
 import DatePicker from 'react-date-picker'
-import { Container, Col, Row, FormGroup, Label, Button, Table, Input } from 'reactstrap'
-import { DisplayError } from '../components/DisplayError'
+import { Col, FormGroup, Label,  Table, Input } from 'reactstrap'
 import './StatisticheDipendente.css'
-import StatisticheAPI, { StatPerDipendente } from '../api/StatisticheAPI'
+import StatisticheAPI, {  StatPerPuntoVendita } from '../api/StatisticheAPI'
 import { Loading } from '../components/Loading'
 import { Layout } from '../components/Layout'
 
 interface CampiDisponibili {
-    punto_vendita: boolean,
-    matricola: boolean,
     nome: boolean,
-    cognome: boolean,
-    totale_incasso: boolean
+    citta: boolean,
+    indirizzo: boolean,
+    cap: boolean,
+    totale_incasso: boolean,
+    numero_ricevute: boolean
 }
 
-export const StatisticaPerDipendenteView : React.FC<{stats: StatPerDipendente[], campi: CampiDisponibili}> = ({stats, campi}) => {
+const StatisticaPerPuntoVenditaView : React.FC<{stats: StatPerPuntoVendita[], campi: CampiDisponibili}> = ({stats, campi}) => {
     return  <Table>
         <thead>
             <tr>
-                {campi.punto_vendita && <th>Punto vendita</th>}
-                {campi.matricola && <th>Matricola</th>}
-                {campi.nome && <th>Nome</th>}
-                {campi.cognome && <th>Cognome</th>}
+                {campi.nome && <th>Punto vendita</th>}
+                {campi.citta && <th>Città</th>}
+                {campi.indirizzo && <th>Indirizzo</th>}
+                {campi.cap && <th>CAP</th>}
+                {campi.numero_ricevute && <th>Ricevute emesse</th>}
                 {campi.totale_incasso && <th>Totale incasso</th>}
             </tr>
         </thead>
         <tbody>
             {stats.map( s => 
-                <tr key={s.punto_vendita}>
-                    {campi.punto_vendita && <td>{s.punto_vendita_nome}</td>}
-                    {campi.matricola && <td>{s.matricola}</td>}
+                <tr key={s.nome}>
                     {campi.nome && <td>{s.nome}</td>}
-                    {campi.cognome && <td>{s.cognome}</td>}
+                    {campi.indirizzo && <td>{s.indirizzo}</td>}
+                    {campi.citta && <td>{s.citta}</td>}
+                    {campi.cap && <td>{s.cap}</td>}
+                    {campi.numero_ricevute && <td>{s.numero_ricevute}</td>}
                     {campi.totale_incasso && <td className={s.totale_incasso > 0 ? 'text-success' : 'text-secondary'}>{s.totale_incasso}</td>}
                 </tr>
             )}
@@ -46,26 +48,30 @@ const useToggle = (field: keyof CampiDisponibili, campi: CampiDisponibili, setCa
     },[campi])
 }
 const SelezionaCampi: React.FC<{campi: CampiDisponibili, setCampi: (c:CampiDisponibili) => void}> = ({campi, setCampi}) => {
-const togglePuntoVendita = useToggle('punto_vendita',campi, setCampi);
-const toggleMatricola = useToggle('matricola',campi, setCampi);
-const toggleNome = useToggle('nome',campi, setCampi);
-const toggleCognome = useToggle('cognome',campi, setCampi);
+const togglePuntoVendita = useToggle('nome',campi, setCampi);
+const toggleIndirizzo = useToggle('indirizzo',campi, setCampi);
+const toggleCitta = useToggle('citta',campi, setCampi);
+const toggleCAP = useToggle('cap',campi, setCampi);
+const toggleNRic = useToggle('numero_ricevute',campi, setCampi);
 const toggleTotaleIncasso = useToggle('totale_incasso',campi, setCampi);
 
 
 
 return  <FormGroup check inline>
         <Label check className="mr-3">
-        <Input type="checkbox" onChange={togglePuntoVendita} checked={campi.punto_vendita}/>Punto vendita
+        <Input type="checkbox" onChange={togglePuntoVendita} checked={campi.nome}/>Punto vendita
         </Label>
         <Label check className="mr-3">
-        <Input type="checkbox" onChange={toggleMatricola} checked={campi.matricola}/>Matricola
+        <Input type="checkbox" onChange={toggleIndirizzo} checked={campi.indirizzo}/>Indirizzo
         </Label>
         <Label check className="mr-3">
-        <Input type="checkbox" onChange={toggleNome} checked={campi.nome}/>Nome
+        <Input type="checkbox" onChange={toggleCitta} checked={campi.citta}/>Citta
         </Label>
         <Label check className="mr-3">
-        <Input type="checkbox" onChange={toggleCognome} checked={campi.cognome}/>Cognome
+        <Input type="checkbox" onChange={toggleCAP} checked={campi.cap}/>CAP
+        </Label>
+        <Label check className="mr-3">
+        <Input type="checkbox" onChange={toggleNRic} checked={campi.numero_ricevute}/>Ricevute emesse
         </Label>
         <Label check className="mr-3">
         <Input type="checkbox" onChange={toggleTotaleIncasso} checked={campi.totale_incasso}/>Totale incasso
@@ -73,14 +79,14 @@ return  <FormGroup check inline>
     </FormGroup>
 }
 
-export const StatisticheDipendente : React.FC = () => {
+export const StatistichePuntoVendita : React.FC = () => {
     const oggi = React.useMemo( ()=> new Date(), [])
     const [error, setError] = React.useState<string>()
     const [loading, setLoading] = React.useState(false)
     const [giorno, setGiorno] = React.useState<Date>()
-    const [stats, setStats] = React.useState<StatPerDipendente[]>()
+    const [stats, setStats] = React.useState<StatPerPuntoVendita[]>()
     const [campi, setCampi] = React.useState<CampiDisponibili>({
-        punto_vendita: true, nome: true, cognome: true, matricola: true, totale_incasso: true
+        nome: true, indirizzo: true, citta: true, cap: true, totale_incasso: true, numero_ricevute:true
     })
 
     const changeGiorno = React.useCallback( (d: Date | Date[]) => {
@@ -92,14 +98,14 @@ export const StatisticheDipendente : React.FC = () => {
     const leggiStatistica = React.useEffect ( ()=> {
         if (! giorno) return;
         setLoading(true)
-        StatisticheAPI.perDipendente(giorno!)
+        StatisticheAPI.perPuntoVendita(giorno!)
         .then (setStats)
         .catch (e => setError(e.message))
         .finally( () => {setLoading(false)});
     },[giorno])
 
-    return <Layout titolo="Statistiche per dipendente" errore={error}
-    headline="In questa pagina puoi vedere tutte le statistiche dei dipendenti di tutti i punti vendita.">
+    return <Layout titolo="Statistiche per punto vendita" errore={error}
+    headline="In questa pagina puoi vedere le statistiche di vendita di tutti i punti vendita. Seleziona un giorno.">
             <Col xs="auto">
                 <Label>Giorno</Label>
                 <DatePicker className="form-control datepicker_cust" onChange={changeGiorno} value={giorno} maxDate={oggi}/>
@@ -110,7 +116,7 @@ export const StatisticheDipendente : React.FC = () => {
             </Col>
         <Col cs="12" className="mt-4">
             {loading ? <Loading/> :null}
-            {stats && <StatisticaPerDipendenteView campi={campi} stats={stats}/>}
+            {stats && <StatisticaPerPuntoVenditaView campi={campi} stats={stats}/>}
         </Col>
     </Layout>
     

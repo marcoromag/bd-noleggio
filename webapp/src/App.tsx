@@ -19,6 +19,7 @@ import { NuovoCliente } from './pages/NuovoCliente';
 import { NotFound } from './pages/NotFound';
 import { Homepage } from './pages/Home';
 import { PrenotaVideo } from './pages/PrenotaVideo';
+import { StatistichePuntoVendita } from './pages/StatistichePuntoVendita';
 
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
           <PrivateRoute path="/nuovo-cliente" component={NuovoCliente}/>
           <PrivateRoute path="/cliente/:cod_fiscale" render={(props) => <DettagliCliente cod_fiscale={props.match.params.cod_fiscale}/>}/>
           <PrivateRoute path="/statistiche/dipendente" component={StatisticheDipendente}/>
+          <PrivateRoute path="/statistiche/punto-vendita" component={StatistichePuntoVendita}/>
           <Route path="*" component={NotFound}/>
         </Switch>
       </Container>

@@ -27,7 +27,7 @@ export const Header : React.FC = () => {
           <Nav className="mr-auto" navbar>
             {isOper && <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Video</DropdownToggle>
-              <DropdownMenu right>
+              <DropdownMenu left>
                 <RoutedDropdownItem href="/ricerca/titolo">Ricerca per titolo</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/ricerca/genere">Ricerca per genere</RoutedDropdownItem>
@@ -39,7 +39,7 @@ export const Header : React.FC = () => {
               <DropdownToggle nav caret>
                 Cliente
               </DropdownToggle>
-              <DropdownMenu right>
+              <DropdownMenu left>
                 <RoutedDropdownItem href="/nuovo-cliente">Nuovo cliente</RoutedDropdownItem>
                 <DropdownItem divider/>
                 <RoutedDropdownItem href="/ricerca/cliente">Ricerca cliente</RoutedDropdownItem>
@@ -51,7 +51,7 @@ export const Header : React.FC = () => {
               <DropdownToggle nav caret>
                 Noleggio
               </DropdownToggle>
-              <DropdownMenu right>
+              <DropdownMenu left>
                 <RoutedDropdownItem href="/prenotazione">Prenota un video</RoutedDropdownItem>
                 <DropdownItem divider/>
                 <RoutedDropdownItem href="/noleggio/attiva">Crea contratto di noleggio</RoutedDropdownItem>
@@ -63,22 +63,20 @@ export const Header : React.FC = () => {
             {isAdmin && 
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Batch</DropdownToggle>
-              <DropdownMenu right>
+              <DropdownMenu left>
                 <RoutedDropdownItem href="/batch/carico">Carico</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/batch/scarico">Scarico</RoutedDropdownItem>
-                <DropdownItem divider />
-                <RoutedDropdownItem href="/batch/carico">Mostra tutte le attività batch</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }
             {isAdmin && 
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Statistiche</DropdownToggle>
-              <DropdownMenu right>
+              <DropdownMenu left>
                 <RoutedDropdownItem href="/statistiche/dipendente">Per dipendente</RoutedDropdownItem>
                 <DropdownItem divider />
-                <RoutedDropdownItem href="/statistiche">Per tutti i punti vendita</RoutedDropdownItem>
+                <RoutedDropdownItem href="/statistiche/punto-vendita">Per tutti i punti vendita</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }

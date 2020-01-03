@@ -1,9 +1,8 @@
 import * as React from 'react'
-import {  Row, Col, Button, Table, CardHeader, Card, CardBody, FormGroup, FormText, Label } from 'reactstrap';
-import VideoAPI, { Video, Supporto } from '../api/VideoAPI';
+import {  Row, Col, Button,  CardHeader, Card, CardBody, FormGroup, FormText, Label } from 'reactstrap';
+import { Video } from '../api/VideoAPI';
 import { Cliente } from '../api/ClienteAPI';
-import ConfigAPI, { TermineNoleggio } from '../api/ConfigAPI';
-import { Loading } from '../components/Loading';
+
 import NoleggioAPI from '../api/NoleggioAPI';
 import { SelezionaVideoPerTitolo } from '../components/SelezionaVideo';
 import { SelezionaCliente } from '../components/SelezionaCliente';
