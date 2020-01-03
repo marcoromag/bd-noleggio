@@ -66,30 +66,27 @@ class InfoNoleggioHandler extends ApiHandler {
     }
 }
 
-class CreaRicevutaHandler extends ApiHandler {
-    static $pathRegexp = '@^/noleggio/([^/]+)/ricevuta$@';
+class StampaRicevutaHandler extends ApiHandler {
+    static $pathRegexp = '@^/ricevuta/([^/]+)$@';
 
     function autorizza ($utente) { return $utente; }
-    function gestisce($path, $method) { return $method == 'POST' && preg_match(self::$pathRegexp,$path); }
+    function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
     function esegui($path, $method, $input) {
 
         if (!preg_match(self::$pathRegexp,$path,$match)) {
-            throw new Exception ("Il path non contiene un ID di noleggio");
+            throw new Exception ("Il path non contiene un ID di ricevuta");
         }
-        $noleggio = $match[1];
-
-        $data_ricevuta = isset($input->data_ricevuta) ? $input->data_ricevuta : date('Y-m-d');
-        $punto_vendita=$_SESSION['UTENTE']['punto_vendita'];
-        $matricola = $_SESSION['UTENTE']['matricola'];
+        $ricevuta = $match[1];
 
         $db = DB::instance();
-        $id_noleggio = $db->creaRicevuta($punto_vendita, $matricola, $noleggio, $data_ricevuta);
-        return $id_noleggio;
+        return $db->selezionaRicevuta($ricevuta);
     }
 }
+ 
+
  
 
 
 ApiController::registraHandler(new CreaNoleggioHandler);
 ApiController::registraHandler(new TerminaNoleggioHandler);
-ApiController::registraHandler(new CreaRicevutaHandler);
+ApiController::registraHandler(new StampaRicevutaHandler);

@@ -1,5 +1,5 @@
 <?php
-require __DIR__."/../db.php";
+require __DIR__."/db.php";
 require __DIR__."/ApiController.php";
 require __DIR__."/LoginHandler.php";
 require __DIR__."/RicercaHandler.php";

@@ -27,10 +27,16 @@ export default async function apifetch  (input: string, init?: RequestInit): Pro
         'Accept':'application/json',
     } 
 
+    const getHeaders = init && (!init.method || init.method === 'GET') && {
+        'pragma':'no-cache',
+        'cache-control':'no-store'
+    } 
+
     const newInit : RequestInit = {
         ...init,
         headers: {
             ...postHeaders,
+            ...getHeaders,
             ...origHeaders
         },
         credentials: 'include'

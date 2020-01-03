@@ -1,11 +1,11 @@
 import * as React from 'react'
-import {  Row, Col, Button, Table, CardHeader, Card, CardBody, Breadcrumb, BreadcrumbItem } from 'reactstrap';
+import {  Row, Col, Button, Table, CardHeader, Card, CardBody, Breadcrumb, BreadcrumbItem, FormGroup, FormText, Label } from 'reactstrap';
 import VideoAPI, { Video, Supporto } from '../api/VideoAPI';
 import { Cliente } from '../api/ClienteAPI';
 import ConfigAPI, { TermineNoleggio } from '../api/ConfigAPI';
 import { Loading } from '../components/Loading';
 import NoleggioAPI from '../api/NoleggioAPI';
-import { SelezionaVideoPerTitolo } from '../components/SelezionaVideoPerTitolo';
+import { SelezionaVideoPerTitolo } from '../components/SelezionaVideo';
 import { SelezionaCliente } from '../components/SelezionaCliente';
 import { MostraCliente, MostraVideo, MostraTermineNoleggio, MostraSupporto } from '../components/MostraDati';
 import { Layout } from '../components/Layout';
@@ -53,7 +53,7 @@ const SelezionaTermineNoleggio : React.FC<{onSelect: (tn: TermineNoleggio) => vo
 
     return listaTerminiNoleggio ? <>
         {listaTerminiNoleggio.map(t => 
-        <Col xs="3">
+        <Col key={t.giorni} xs="12" sm="6" md="4">
             <Card>
                 <CardHeader>
                     {t.giorni} giorni
@@ -72,16 +72,31 @@ const SelezionaTermineNoleggio : React.FC<{onSelect: (tn: TermineNoleggio) => vo
 
 
 const MostraDati: React.FC<{cliente?: Cliente, video?: Video, supporto?: Supporto, termine?: TermineNoleggio}> = ({cliente, video, supporto, termine}) => {
-    return (cliente || video || supporto || termine) ? 
-    <Col xs="12">
-        <Row className="bg-warning p-3 align-items-stretch mb-4">
-        {cliente && <Col xs="12" sm="4"><MostraCliente cliente={cliente}/></Col>}
-        {video && <Col xs="12" sm="4"><MostraVideo video={video}/></Col>}
-        {supporto && <Col xs="12" sm="4"><MostraSupporto supporto={supporto}/></Col>}
-        {termine && <Col xs="12" sm="4"><MostraTermineNoleggio termine={termine}/></Col>}
-        </Row>
-    </Col>
-    : null
+
+    return <Card>
+        <CardHeader>
+            Selezione corrente
+        </CardHeader>
+        <CardBody>
+            <FormGroup>
+                <FormText>Cliente</FormText>
+                <Label>{cliente ? `${cliente.nome} ${cliente.cognome}`: "-"}</Label>
+            </FormGroup>
+            <FormGroup>
+                <FormText>Video</FormText>
+                <Label>{video ? video.titolo: "-"}</Label>
+            </FormGroup>
+            <FormGroup>
+                <FormText>Supporto</FormText>
+                <Label>{supporto ? supporto.id: "-"}</Label>
+            </FormGroup>
+            <FormGroup>
+                <FormText>Termine</FormText>
+                <Label>{termine ? `${termine.giorni} giorno`: "-"}</Label>
+            </FormGroup>
+        </CardBody>
+    </Card>
+
 }
 
 
@@ -149,13 +164,19 @@ export const Noleggio : React.FC = () => {
     
     return <Layout titolo="Attiva noleggio" errore={error}>
         <Steps steps={titoloStep} corrente={step} stepClick={setStep}/>
-        <MostraDati cliente={cliente} video={video} supporto={supporto} termine={termineNoleggio}/>
-        {step === 0 && <SelezionaCliente onSelect={selezionaCliente}/>}
-        {step === 1 && <SelezionaVideoPerTitolo onSelect={selezionaVideo}/> }
-        {step === 2 && <SelezionaSupporto video={video!.id} onSelect={selezionaSupporto}/>}
-        {step === 3 && <SelezionaTermineNoleggio onSelect={selezionaTermineNoleggio}/>}
-        {step === 4 && <Col xs="12"><Button onClick={confermaNoleggio}>Conferma il noleggio</Button></Col>}
-        {step === 5 && <Col xs="12">Noleggio confermato con ID {idNoleggio}</Col>}
+        <Col xs="8" sm="8">
+            <Row>
+            {step === 0 && <SelezionaCliente onSelect={selezionaCliente}/>}
+            {step === 1 && <SelezionaVideoPerTitolo onSelect={selezionaVideo}/> }
+            {step === 2 && <SelezionaSupporto video={video!.id} onSelect={selezionaSupporto}/>}
+            {step === 3 && <SelezionaTermineNoleggio onSelect={selezionaTermineNoleggio}/>}
+            {step === 4 && <Col xs="12"><Button onClick={confermaNoleggio}>Conferma il noleggio</Button></Col>}
+            {step === 5 && <Col xs="12">Noleggio confermato con ID {idNoleggio}</Col>}
+            </Row>
+        </Col>
+        <Col xs="12" sm="4">
+            <MostraDati cliente={cliente} video={video} supporto={supporto} termine={termineNoleggio}/>
+        </Col>
     </Layout>
 
 

@@ -28,8 +28,8 @@ const ricercaPerTitolo = async (titolo: string) => {
     return response.json() as Promise<Video[]>
 }
 
-const ricercaPerGenere = async (genere: string) => {
-    const response = await apifetch(`/catalogo/ricerca/genere?genere=${genere}`, {
+const ricercaPerGenere = async (genere: string, pagina: number, size: number) => {
+    const response = await apifetch(`/catalogo/ricerca/genere?genere=${genere}&pagina=${pagina}&size=${size}`, {
         method:'GET',
     })
     return response.json() as Promise<Video[]>

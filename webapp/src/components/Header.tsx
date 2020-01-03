@@ -13,7 +13,7 @@ export const Header : React.FC = () => {
             await LoginAPI.logout();
         } finally 
         {
-            setLogin({isLoggedIn:false, user:undefined});
+            setLogin({isLoggedIn:false});
         }
     },[setLogin])
 
@@ -31,6 +31,8 @@ export const Header : React.FC = () => {
                 <RoutedDropdownItem href="/ricerca/titolo">Ricerca per titolo</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/ricerca/genere">Ricerca per genere</RoutedDropdownItem>
+                <DropdownItem divider />
+                <RoutedDropdownItem href="/ricerca/cliente">Ricerca cliente</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }
@@ -40,7 +42,7 @@ export const Header : React.FC = () => {
                 Noleggio
               </DropdownToggle>
               <DropdownMenu right>
-                <RoutedDropdownItem href="/nuovocliente">Nuovo cliente</RoutedDropdownItem>
+                <RoutedDropdownItem href="/nuovo-cliente">Nuovo cliente</RoutedDropdownItem>
                 <DropdownItem divider/>
                 <RoutedDropdownItem href="/noleggio/attiva">Crea contratto di noleggio</RoutedDropdownItem>
                 <DropdownItem divider/>
@@ -64,7 +66,7 @@ export const Header : React.FC = () => {
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Statistiche</DropdownToggle>
               <DropdownMenu right>
-                <RoutedDropdownItem href="/statistiche/dipendente">Per dipendente del tuo punto vendita</RoutedDropdownItem>
+                <RoutedDropdownItem href="/statistiche/dipendente">Per dipendente</RoutedDropdownItem>
                 <DropdownItem divider />
                 <RoutedDropdownItem href="/statistiche">Per tutti i punti vendita</RoutedDropdownItem>
               </DropdownMenu>

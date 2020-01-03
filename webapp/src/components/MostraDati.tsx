@@ -3,7 +3,7 @@ import { TermineNoleggio } from "../api/ConfigAPI"
 import { CardHeader, CardBody, Card } from "reactstrap"
 import { Cliente } from "../api/ClienteAPI"
 import { Video, Supporto } from '../api/VideoAPI'
-import { NoleggioAttivo } from '../api/NoleggioAPI'
+import { Noleggio } from '../api/NoleggioAPI'
 
 export const MostraTermineNoleggio : React.FC<{termine: TermineNoleggio}> = ({termine}) => {
     return <Card>
@@ -50,7 +50,7 @@ export const MostraSupporto: React.FC<{supporto: Supporto}> =({supporto}) => {
     </Card>
 }
 
-export const MostraNoleggio: React.FC<{noleggio: NoleggioAttivo}> =({noleggio}) => {
+export const MostraNoleggio: React.FC<{noleggio: Noleggio}> =({noleggio}) => {
     return <Card>
         <CardHeader>
             <h5>Noleggio</h5>

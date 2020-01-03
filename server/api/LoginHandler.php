@@ -36,6 +36,7 @@ class UtenteHandler extends ApiHandler {
             throw new Exception ("Non loggato");
         }
         $utente = $_SESSION['UTENTE'];
+        $risposta = new stdClass;
         $risposta->matricola = $utente['matricola'];
         $risposta->tipo = $utente['tipo'];
         $risposta->nome = $utente['nome'];

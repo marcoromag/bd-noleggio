@@ -2,19 +2,21 @@ import * as React from 'react'
 import { Route, RouteProps, Redirect } from 'react-router'
 import { useLogin } from '../GlobalContext'
 
-export const PrivateRoute : React.FC<RouteProps> = ({ children, ...rest }) => {
+export const PrivateRoute : React.FC<RouteProps> = ({ children, render, component, ...rest }) => {
     const [login] = useLogin()
     return (
       <Route
         {...rest}
-        render={({ location }) =>
+        render={(props) =>
           login.isLoggedIn ? (
-            children
+            (render &&  render(props))
+            || (component && React.createElement(component))  
+            ||children
           ) : (
             <Redirect
               to={{
                 pathname: "/login",
-                state: { from: location }
+                state: { from: props.location }
               }}
             />
           )

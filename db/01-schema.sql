@@ -253,7 +253,7 @@ create view v_statistica_per_punto_vendita as
 ;
     
 create or replace view v_contratto_noleggio_attivo as
-	select contratto_noleggio.id,supporto,cliente,impiegato_creazione,data_inizio, termine_noleggio, video.id as video, titolo
+	select contratto_noleggio.id,supporto, punto_vendita, cliente,impiegato_creazione,data_inizio, termine_noleggio, video.id as video, titolo
     from cliente 
     join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
     join supporto on supporto.id = contratto_noleggio.supporto
@@ -262,13 +262,31 @@ create or replace view v_contratto_noleggio_attivo as
 ;
 
 create or replace view v_contratto_noleggio_terminato as 
-	select contratto_noleggio.id,supporto, punto_vendita, cliente,impiegato,data_inizio, data_restituzione, termine_noleggio, video.id as video, titolo, ricevuta.numero_ricevuta as ricevuta
+	select contratto_noleggio.id,supporto, punto_vendita, cliente,impiegato_creazione, impiegato_restituzione, data_inizio, data_restituzione, termine_noleggio, video.id as video, titolo, ricevuta.numero_ricevuta as ricevuta
         from cliente 
         join contratto_noleggio on cliente.cod_fiscale = contratto_noleggio.cliente
         join supporto on supporto.id = contratto_noleggio.supporto
         join video on video.id = supporto.video
         left join ricevuta on ricevuta.contratto_noleggio = contratto_noleggio.id
         where contratto_noleggio.data_restituzione is not NULL
+;
+
+create or replace view v_ricevuta as
+	select numero_ricevuta, data, 
+	supporto,
+	titolo, 
+	cliente, cliente.nome, cliente.cognome, indirizzo, citta, cap, 
+	impiegato.nome as impiegato_nome, impiegato.cognome as impiegato_cognome, matricola, 
+	data_inizio, data_restituzione,
+	sum(costo) as totale
+	from ricevuta
+	join contratto_noleggio on contratto_noleggio.id = ricevuta.contratto_noleggio
+	join supporto on supporto.id = contratto_noleggio.supporto
+	join video on video.id = supporto.video
+	join impiegato on impiegato.matricola = ricevuta.impiegato
+	join cliente on cliente.cod_fiscale = contratto_noleggio.cliente
+	join voce_ricevuta on voce_ricevuta.ricevuta = ricevuta.numero_ricevuta
+	group by numero_ricevuta 
 ;
 
 create or replace view v_supporto_disponibile as 

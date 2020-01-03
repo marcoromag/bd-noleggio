@@ -16,9 +16,11 @@ class RicercaPerGenereHandler extends ApiHandler {
     function gestisce($uri, $method) { return $method == 'GET' && $uri == '/catalogo/ricerca/genere'; }
     function esegui($uri, $method, $data) { 
         $genere = $_GET['genere'];
+        $pagina = isset($_GET['pagina'])? $_GET['pagina'] : 0;
+        $size = isset($_GET['size'])? $_GET['size'] : 100;
         $utente = $_SESSION['UTENTE'];
         $db = DB::instance();
-        $esito = $db->ricercaCatalogoPerGenere($utente['punto_vendita'], $genere);
+        $esito = $db->ricercaCatalogoPerGenere($utente['punto_vendita'], $genere, $pagina, $size);
         return $esito;
     }
 }

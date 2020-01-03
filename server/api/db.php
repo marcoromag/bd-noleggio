@@ -167,15 +167,18 @@ class DB {
         $this->conn->commit();
     }
 
-    function ricercaCatalogoPerGenere($punto_vendita,$genere) {
+    function ricercaCatalogoPerGenere($punto_vendita,$genere, $pagina, $size) {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
         join catalogo on catalogo.video = video.id
         where video.genere = ? 
-        and catalogo.punto_vendita = ?'
+        and catalogo.punto_vendita = ?
+        order by id
+        limit ?,?'
         );
-        $stmt->bind_param("si",$genere, $punto_vendita);
+        $start = $pagina * $size;
+        $stmt->bind_param("siii",$genere, $punto_vendita, $start, $size);
         return $this->fetch_all($stmt);
     }
 
@@ -183,8 +186,8 @@ class DB {
         $stmt = $this->prepare_statement ('selezionaNoleggiAttiviPerCliente',
         'select id,supporto,cliente,impiegato_creazione,data_inizio, termine_noleggio, video, titolo
         from v_contratto_noleggio_attivo 
-        where cod_fiscale = ?
-        and supporto.punto_vendita=?
+        where cliente = ?
+        and punto_vendita=?
         ');
         $stmt->bind_param("sd",$cod_fiscale, $punto_vendita);
         return $this->fetch_all($stmt);
@@ -193,7 +196,7 @@ class DB {
 
     function selezionaNoleggiTerminatiPerCliente($cod_fiscale, $punto_vendita) {
         $stmt = $this->prepare_statement ('selezionaNoleggiTerminatiPerCliente',
-        'select id,supporto,cliente,impiegato,data_inizio, data_restituzione, termine_noleggio, video, titolo, ricevuta
+        'select id,supporto,cliente,impiegato_creazione, impiegato_restituzione, data_inizio, data_restituzione, termine_noleggio, video, titolo, ricevuta
         from v_contratto_noleggio_terminato 
         where cliente = ?
         and punto_vendita=?
@@ -394,7 +397,8 @@ class DB {
                 throw new Exception($update_supporto->error);
             } 
 
-            //aggiorna le disponibilità dopo lo scarico
+            //aggiorna le disponibilità dopo lo scarico, prendendo il conteggio di
+            //tutti i titolo scaricati in buono stato
             $update_disponibilita = $this->prepare_statement('scaricaSupportiBatch_updateDisponibilita',
             'update catalogo
             join 
@@ -402,6 +406,7 @@ class DB {
                  select video, punto_vendita, count(*) as qta_scaricata
                  from supporto
                  where batch_scarico=?
+                 and stato_fisico = \'BUONO\'
                  group by video, punto_vendita
                ) scaricati on 
                  catalogo.video = scaricati.video
@@ -575,12 +580,37 @@ class DB {
                     throw new Exception($aggiorna_disp->error);
                 }
             }
+
+            //crea una ricevuta implicitamente
+            $risposta = new stdClass;
+            $risposta->id_ricevuta = $this->creaRicevuta ($punto_vendita, $impiegato, $noleggio, $dataFine);
             $this->conn->commit();
-            return $totale_pagato;
+            return $risposta;
         } catch(Exception $e) {
             $this->conn->rollback();
             throw $e;
         } 
+    }
+
+    function selezionaRicevuta ($ricevuta) {
+        $sel_ricevuta = $this->prepare_statement('selezionaRicevuta',
+        'select numero_ricevuta, supporto, titolo, cliente, nome, cognome, indirizzo, citta, cap, impiegato_nome, impiegato_cognome, matricola, data_inizio, data_restituzione, totale
+        from v_ricevuta
+        where numero_ricevuta=?');
+        $sel_ricevuta->bind_param('s',$ricevuta);
+        $dati_ricevuta = $this->fetch_single($sel_ricevuta);
+        if (!$dati_ricevuta) {
+            throw new Exception ("Supporto non trovato");
+        }
+
+        $sel_dettagli = $this->prepare_statement('selezionaRicevuta_dettagli',
+        'select descrizione, costo
+        from voce_ricevuta
+        where ricevuta=? order by ordine');
+        $sel_dettagli->bind_param('s',$ricevuta);
+        $dati_ricevuta['dettagli'] = $this->fetch_all($sel_dettagli);
+
+        return $dati_ricevuta;
     }
 
     private function insertRicevuta($impiegato, $noleggio, $data) {
@@ -655,12 +685,12 @@ class DB {
                 ? $importo_iniziale 
                 : $importo_iniziale + ($giorni-$termine) * $importo_gg_successivi;
 
-            $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo base del noleggio di "'.$titolo.'" supporto '.$supporto.' (primi '.$termine.' gg)', $importo_iniziale);
+            $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo base del noleggio  (primi '.$termine.' gg)', $importo_iniziale);
             if ($giorni > $termine) {
-                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo aggiuntivo del noleggio di "'.$titolo.'" supporto '.$supporto.'  (successivi '.($giorni-$termine).' gg)', ($giorni-$termine) * $importo_gg_successivi);
+                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo aggiuntivo del noleggio (successivi '.($giorni-$termine).' gg)', ($giorni-$termine) * $importo_gg_successivi);
             }
             if ($stato_restituzione == 'DANNEGGIATO') {
-                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo danneggiamento titolo "'.$titolo.'" supporto '.$supporto ,$costo_supporto );
+                $this->insertVoceRicevuta($idRicevuta, $ordine++, 'Costo danneggiamento supporto ',$costo_supporto );
             }
             
             $this->conn->commit();

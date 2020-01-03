@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { User } from './api/LoginAPI';
+import LoginAPI, { User } from './api/LoginAPI';
+import { Loading } from './components/Loading';
+import { Layout } from './components/Layout';
 
 export interface LoginContext {
     isLoggedIn: boolean,
@@ -26,6 +28,7 @@ export const useLogin = () => {
 }
 
 export const GlobalContextProvider : React.FC = ({children}) => {
+    const [isLoading, setLoading] = React.useState(true);
     const [state, setState] = React.useState<GlobalContext>({
         ...initialState,
         setLogin: (login) => {
@@ -33,7 +36,27 @@ export const GlobalContextProvider : React.FC = ({children}) => {
         }
     })
 
+    React.useEffect( () => {
+        LoginAPI.user().then ( user => {
+            setState({
+                ...state,
+                login: {
+                    isLoggedIn:true,
+                    user
+                }
+            })
+            setLoading(false);
+        })
+        .catch( () => {
+            setState({
+                ...state,
+                login: {isLoggedIn:false}
+            })
+            setLoading(false);
+        })
+    },[])
+
     return <GlobalContext.Provider value={state}>
-        {children}
+        {isLoading ? <Layout><Loading/></Layout> : children}
     </GlobalContext.Provider>
 }

@@ -1,16 +1,42 @@
 import apifetch from "./api-fetch"
 
 
-export interface NoleggioAttivo {
+export interface Noleggio {
     id: string,
     supporto: string,
     cliente: string,
     impiegato: string,
     data_inizio: string,
-    data_fine: string,
+    data_restituzione?: string,
     termine_noleggio: number,
     video: string,
-    titolo: string
+    titolo: string,
+    ricevuta?: string
+}
+
+export interface Ricevuta {
+    numero_ricevuta: string,
+    supporto: string,
+    titolo: string,
+    cliente: string,
+    nome: string,
+    cognome: string,
+    indirizzo: string,
+    citta: string
+    cap: string,
+    impiegato_nome: string,
+    impiegato_cognome: string,
+    matricola: string,
+    totale: number,
+    dettagli: DettagliRicevuta[]
+}
+
+export interface DettagliRicevuta {
+    descrizione: string,
+    costo: number
+}
+export interface RspTerminaNoleggio {
+    id_ricevuta: string
 }
 
 export type StatoSupporto= 'BUONO' | 'DANNEGGIATO'
@@ -34,7 +60,12 @@ const termina = async (id_noleggio: string, stato: StatoSupporto) => {
             stato
         })
     })
-    return response.json() as Promise<number>    
+    return response.json() as Promise<RspTerminaNoleggio>    
+}
+
+const ricevuta = async (id_ricevuta: string) => {
+    const response = await apifetch(`/ricevuta/${id_ricevuta}`)
+    return response.json() as Promise<Ricevuta>   
 }
 
 
@@ -42,12 +73,21 @@ const noleggiAttiviPerCliente = async (cod_fiscale:string) => {
     const response = await apifetch(`/cliente/${cod_fiscale}/noleggi`, {
         method:'GET'
     })
-    return response.json() as Promise<NoleggioAttivo[]>    
+    return response.json() as Promise<Noleggio[]>    
+}
+
+const noleggiTerminatiPerCliente = async (cod_fiscale:string) => {
+    const response = await apifetch(`/cliente/${cod_fiscale}/noleggi-terminati`, {
+        method:'GET'
+    })
+    return response.json() as Promise<Noleggio[]>    
 }
 
 
 export default {
     attiva,
     termina,
-    noleggiAttiviPerCliente
+    ricevuta,
+    noleggiAttiviPerCliente,
+    noleggiTerminatiPerCliente
 }
