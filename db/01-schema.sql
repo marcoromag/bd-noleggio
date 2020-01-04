@@ -25,7 +25,6 @@ create or replace table impiegato (
 
 alter table impiegato add constraint ck_unico_dirigente check ( (select count(*) from impiegato where punto_vendita=`punto_vendita` and tipo='DIRIGENTE') <= 1);
 
-
 create or replace table fornitore (
 	id varchar(36) not null,
 	nome varchar(64) not null,
@@ -85,7 +84,7 @@ create or replace table supporto (
 	noleggio_corrente varchar(36),
 	CONSTRAINT pk_supporto PRIMARY key (id),
 	CONSTRAINT key_supporto_carico UNIQUE key (seriale, fornitore, batch_carico),
-    CONSTRAINT key_supporto_scarico UNIQUE key (seriale, fornitore, batch_scarico),
+    CONSTRAINT key_supporto_scarico UNIQUE key (seriale, fornitore, batch_carico, batch_scarico),
 	CONSTRAINT fk_supporto_video FOREIGN key (video) REFERENCES video(id),
 	CONSTRAINT fk_supporto_fornitore FOREIGN key (fornitore) REFERENCES fornitore(id),
 	CONSTRAINT fk_supporto_punto_vendita FOREIGN key (punto_vendita) REFERENCES punto_vendita(id),
@@ -185,7 +184,8 @@ create or replace table prenotazione(
 	video varchar(36) not null,
 	punto_vendita int not null,
 	CONSTRAINT pk_prenotazione primary key (cliente, video, punto_vendita),
-	CONSTRAINT fk_prenotazione_catalogo foreign key (video,punto_vendita) REFERENCES catalogo(video,punto_vendita),
+	CONSTRAINT fk_prenotazione_video foreign key (video) REFERENCES video(id),
+	CONSTRAINT fk_prenotazione_punto_vendita foreign key (punto_vendita) REFERENCES punto_vendita(id),
 	CONSTRAINT fk_prenotazione_cliente foreign key (cliente) references cliente(cod_fiscale)
 );
 
@@ -294,5 +294,3 @@ create or replace view v_supporto_disponibile as
      and noleggio_corrente is null 
      and batch_scarico is null
 ;
-
-

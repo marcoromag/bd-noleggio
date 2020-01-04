@@ -213,15 +213,14 @@ class DB {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
-        join catalogo on catalogo.video = video.id
+        left join catalogo on catalogo.video = video.id and catalogo.punto_vendita = ?
         where video.genere = ? 
-        and catalogo.punto_vendita = ?
         and tipo = ?
         order by id
         limit ?,?'
         );
         $start = $pagina * $size;
-        $stmt->bind_param("sisii",$genere, $punto_vendita, $tipo, $start, $size);
+        $stmt->bind_param("issii",$punto_vendita, $genere,  $tipo, $start, $size);
         return $this->fetch_all($stmt);
     }
 
@@ -254,13 +253,12 @@ class DB {
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
         'select id, genere, tipo, titolo, regista, casa_produttrice, data_disponibilita, ifnull(quantita_disponibile,0) as quantita_disponibile
         from video 
-        join catalogo on catalogo.video = video.id 
+        left join catalogo on catalogo.video = video.id and catalogo.punto_vendita = ?
         where MATCH(titolo) AGAINST (? IN NATURAL LANGUAGE MODE) 
-        and catalogo.punto_vendita = ?
         and tipo=?
         '
         );
-        $stmt->bind_param("sis",$titoloLike, $punto_vendita, $tipo);
+        $stmt->bind_param("iss", $punto_vendita,$titoloLike,  $tipo);
         return $this->fetch_all($stmt);
     }
 
