@@ -29,14 +29,7 @@ class UtenteHandler extends ApiHandler {
         if ( (!isset($_SESSION)) || (!isset($_SESSION['UTENTE'])) ) {
             throw new Exception ("Non loggato");
         }
-        $utente = $_SESSION['UTENTE'];
-        $risposta = new stdClass;
-        $risposta->matricola = $utente['matricola'];
-        $risposta->tipo = $utente['tipo'];
-        $risposta->nome = $utente['nome'];
-        $risposta->cognome = $utente['cognome'];
-        $risposta->punto_vendita = $utente['punto_vendita'];
-        return $risposta;
+        return  $_SESSION['UTENTE'];
     }
 }
 

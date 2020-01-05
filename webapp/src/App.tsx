@@ -20,6 +20,8 @@ import { NotFound } from './pages/NotFound';
 import { Homepage } from './pages/Home';
 import { PrenotaVideo } from './pages/PrenotaVideo';
 import { StatistichePuntoVendita } from './pages/StatistichePuntoVendita';
+import { RisultatoBatch } from './pages/RisultatoBatch';
+import { ListaBatch } from './pages/ListaBatch';
 
 
 function App() {
@@ -32,8 +34,8 @@ function App() {
         <Switch>
           <Route exact path="/login" component={Login}/>
           <PrivateRoute exact path="/" component={Homepage}/>
-          <PrivateRoute path="/batch/scarico" component={BatchScarico}/>
-          <PrivateRoute path="/batch/carico" component={BatchCarico}/>
+          <PrivateRoute path="/batch-scarico" component={BatchScarico}/>
+          <PrivateRoute path="/batch-carico" component={BatchCarico}/>
           <PrivateRoute exact path="/ricerca/titolo" component={RicercaPerTitolo}/>
           <PrivateRoute exact path="/ricerca/genere" component={RicercaPerGenere}/>
           <PrivateRoute exact path="/ricerca/cliente" component={RicercaCliente}/>
@@ -43,6 +45,8 @@ function App() {
           <PrivateRoute path="/ricevuta/:id" render={(props) => <DisplayRicevuta id={props.match.params.id}/>}/>
           <PrivateRoute path="/nuovo-cliente" component={NuovoCliente}/>
           <PrivateRoute path="/cliente/:cod_fiscale" render={(props) => <DettagliCliente cod_fiscale={props.match.params.cod_fiscale}/>}/>
+          <PrivateRoute exact path="/batch" component={ListaBatch}/>
+          <PrivateRoute path="/batch/:batch_id" render={(props) => <RisultatoBatch batch_id={props.match.params.batch_id}/>}/>
           <PrivateRoute path="/statistiche/dipendente" component={StatisticheDipendente}/>
           <PrivateRoute path="/statistiche/punto-vendita" component={StatistichePuntoVendita}/>
           <Route path="*" component={NotFound}/>

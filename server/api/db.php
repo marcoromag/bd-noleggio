@@ -324,7 +324,7 @@ class DB {
 
     function listaBatch($punto_vendita) {
         $select_batch= $this->prepare_statement('listaBatch',
-        'select id, tipo, esito, errore, punto_vendita, impiegato, data
+        'select id as batch_id, tipo, esito, errore, punto_vendita, impiegato, data
          from batch
          where punto_vendita=?
         ');

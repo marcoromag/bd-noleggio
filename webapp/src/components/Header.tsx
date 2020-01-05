@@ -21,7 +21,9 @@ export const Header : React.FC = () => {
     const isOper = login.isLoggedIn && login.user;
 
     return <Navbar color="light" light expand="md" sticky="top">
-        <NavbarBrand><i className="fas fa-cat fa-3x"></i></NavbarBrand>
+        <NavbarBrand>
+          <i className="fas fa-cat fa-3x"></i>{login.isLoggedIn && login.user!.nome_punto_vendita}
+        </NavbarBrand>
         <NavbarToggler onClick={toggle} />
        <Collapse isOpen={isOpen} navbar>
           <Nav className="mr-auto" navbar>
@@ -64,9 +66,11 @@ export const Header : React.FC = () => {
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Batch</DropdownToggle>
               <DropdownMenu left>
-                <RoutedDropdownItem href="/batch/carico">Carico</RoutedDropdownItem>
+                <RoutedDropdownItem href="/batch-carico">Carico</RoutedDropdownItem>
                 <DropdownItem divider />
-                <RoutedDropdownItem href="/batch/scarico">Scarico</RoutedDropdownItem>
+                <RoutedDropdownItem href="/batch-scarico">Scarico</RoutedDropdownItem>
+                <DropdownItem divider />
+                <RoutedDropdownItem href="/batch">Lista esecuzioni batch</RoutedDropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
             }

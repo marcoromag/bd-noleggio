@@ -1,4 +1,5 @@
 import apifetch from "./api-fetch";
+import { isodate } from "./utils";
 
 export interface Supporto {
     id: string,
@@ -27,20 +28,31 @@ export interface SupportoCarico {
     costo_supporto: number
 }
 
-const scarico = async (fornitore: string) => {
+const esito = async (batch_id: string) => {
+    const response = await apifetch(`/batch/${batch_id}`)
+    return response.json() as Promise<Batch>
+}
+
+const lista = async () => {
+    const response = await apifetch(`/batch`)
+    return response.json() as Promise<Batch[]>
+}
+
+const scarico = async (fornitore: string, data?: Date) => {
     const response = await apifetch('/batch/scarico', {
         method:'POST',
-        body:JSON.stringify({fornitore})
+        body:JSON.stringify({fornitore, data: (data ? isodate(data) : undefined)})
     })
     return response.json() as Promise<Batch>
 }
 
-const carico = async (fornitore: string, lista: SupportoCarico[]) => {
+const carico = async (fornitore: string, lista: SupportoCarico[], data?: Date) => {
     const response = await apifetch('/batch/carico', {
         method:'POST',
         body:JSON.stringify({
             fornitore,
-            lista
+            lista,
+            data: (data ? isodate(data) : undefined)
         })
     })
     return response.json() as Promise<Batch>
@@ -48,7 +60,9 @@ const carico = async (fornitore: string, lista: SupportoCarico[]) => {
 
 export default {
     scarico,
-    carico
+    carico,
+    esito,
+    lista
 }
 
 

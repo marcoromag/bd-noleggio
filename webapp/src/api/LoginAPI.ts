@@ -5,7 +5,8 @@ export interface User {
     nome: string,
     cognome: string,
     tipo: 'DIRIGENTE' | 'IMPIEGATO',
-    punto_vendita: number
+    punto_vendita: number,
+    nome_punto_vendita: string
 }
 
 const login = async (utente: string, password: string) => {
