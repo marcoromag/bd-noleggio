@@ -14,6 +14,7 @@ export interface Batch {
     batch_id: string,
     tipo: 'CARICO' | 'SCARICO',
     esito: string,
+    errore?: string,
     punto_vendita: number,
     impiegato: string,
     data: string,

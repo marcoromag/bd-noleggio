@@ -177,22 +177,28 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
         <Col xs="12">
             <h4>Dati anagrafici</h4>
         </Col>
-        <Col xs="6" sm="4">
+        <Col xs="6" md="3">
             <FormGroup>
                 <FormText>Nome</FormText>
                 <Label>{cliente.nome}</Label>
             </FormGroup>
         </Col>
-        <Col xs="6" sm="4">
+        <Col xs="6" md="4">
             <FormGroup>
                 <FormText>Cognome</FormText>
                 <Label>{cliente.cognome}</Label>
             </FormGroup>
         </Col>
-        <Col xs="12" sm="4">
+        <Col xs="12" md="3">
             <FormGroup>
                 <FormText>Codice fiscale</FormText>
                 <Label>{cliente.cod_fiscale}</Label>
+            </FormGroup>
+        </Col>
+        <Col xs="12" md="2">
+            <FormGroup>
+                <FormText>Data di nascita</FormText>
+                <Label>{cliente.data_nascita}</Label>
             </FormGroup>
         </Col>
 
@@ -250,7 +256,7 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
         {noleggiAttivi && noleggiAttivi.length ? 
             noleggiAttivi.map(n => <MostraNoleggio key={n.id} noleggio={n}/>) 
             : <Col xs="12">
-                <Alert>Nessun noleggio attivo</Alert>
+                <Alert color="info">Nessun noleggio attivo</Alert>
             </Col>
         }
 
@@ -260,18 +266,19 @@ export const DettagliCliente : React.FC<{cod_fiscale:string}> = ({cod_fiscale}) 
         {noleggiTerminati && noleggiTerminati.length ?
             noleggiTerminati.map(n => <MostraNoleggio key={n.id} noleggio={n}/>)  
             : <Col xs="12">
-                <Alert>Nessun noleggio terminato</Alert>
+                <Alert color="info">Nessun noleggio terminato</Alert>
             </Col>
         }
-                <Col xs="12" className="mt-4">
+        <Col xs="12" className="mt-4">
             <h4>Prenotazioni</h4>
-            {prenotazioni && prenotazioni.length ?
-                prenotazioni.map(v => <VideoView key={v.id} video={v}/>)  
-                :<Col xs="12">
-                    <Alert>Nessuna prenotazione attiva</Alert>
-                </Col>
-        }
         </Col>
+        {prenotazioni && prenotazioni.length ?
+            prenotazioni.map(v => <VideoView key={v.id} video={v}/>)  
+            :<Col xs="12">
+                <Alert color="info">Nessuna prenotazione attiva</Alert>
+            </Col>
+        }
+
     </>
     }
     </Layout>

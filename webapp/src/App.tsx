@@ -25,7 +25,7 @@ import { StatistichePuntoVendita } from './pages/StatistichePuntoVendita';
 function App() {
   return (
 
-    <Router basename="/noleggio/webapp">
+    <Router basename="/webapp">
     <GlobalContextProvider>
       <Container>
         <Header/>

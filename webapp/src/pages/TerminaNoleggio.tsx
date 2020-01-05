@@ -24,7 +24,6 @@ const SelezionaNoleggioPerCliente : React.FC<{cod_fiscale: string, onSelect: (na
                 <tr>
                     <th>Id</th>
                     <th>Data inizio</th>
-                    <th>Data fine</th>
                     <th>Termine noleggio</th>
                     <th>Titolo</th>
                     <th></th>
@@ -33,8 +32,8 @@ const SelezionaNoleggioPerCliente : React.FC<{cod_fiscale: string, onSelect: (na
             <tbody>
             {listaNoleggiAttivi.map(n => 
                 <tr key={n.id}>
+                    <td>{n.id}</td>
                     <td>{n.data_inizio}</td>
-                    <td>{n.data_restituzione}</td>
                     <td>{n.termine_noleggio} giorni</td>
                     <td>{n.titolo}</td>
                     <td><Button onClick={() => onSelect(n)}>Seleziona</Button></td>

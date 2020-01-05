@@ -4,7 +4,7 @@ import ConfigAPI, { Fornitore } from '../api/ConfigAPI';
 
 
 
-export const SelectFornitore : React.FC<InputProps & {onLoadError?: (error: string) => void}> = ({onLoadError, ...rest}) => {
+export const SelectFornitore : React.FC<InputProps & {onLoadError?: (error: string) => void}> = ({onLoadError, value, ...rest}) => {
     const [listaFornitori, setFornitori] = React.useState<Fornitore[]>();
 
     React.useEffect( () => {
@@ -15,7 +15,8 @@ export const SelectFornitore : React.FC<InputProps & {onLoadError?: (error: stri
         })
     },[onLoadError])
 
-    return  <Input {...rest} type="select">
+    return  <Input {...rest} type="select" value={value}>
+        {!value && <option>-- seleziona --</option>}
         {listaFornitori && listaFornitori.map( f => <option key={f.id} value={f.id}>{f.nome}</option>)}
     </Input>
 }

@@ -13,11 +13,17 @@ export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {
             <Col xs="6" sm="3">Esito</Col>
             <Col xs="6" sm="9">{batch.esito}</Col>
 
+            {batch.errore && <>
+            <Col xs="6" sm="3">Errore</Col>
+            <Col xs="6" sm="9">{batch.errore}</Col>
+            </> }
+
             <Col xs="6" sm="3">Data</Col>
             <Col xs="6" sm="9">{batch.data}</Col>
 
             <Col xs="6" sm="3">Impiegato</Col>
             <Col xs="6" sm="9">{batch.impiegato}</Col>
+            {batch.supporti && !!batch.supporti.length && <>
             <Col xs="12"><h2>Supporti</h2></Col>
             <Col xs="12">
             <Table>
@@ -33,7 +39,7 @@ export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {batch.supporti && batch.supporti.map( s => 
+                    {batch.supporti.map( s => 
                         <tr key={s.id}>
                             <th>{s.id}</th>
                             <td>{s.seriale}</td>
@@ -47,6 +53,7 @@ export const BatchView : React.FC<{batch: Batch}> = ({batch}) => {
                 </tbody>
             </Table>
             </Col>
+            </> }
         </>
         
 }

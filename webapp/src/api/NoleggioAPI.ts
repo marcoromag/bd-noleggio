@@ -17,6 +17,7 @@ export interface Noleggio {
 
 export interface Ricevuta {
     numero_ricevuta: string,
+    data: string,
     supporto: string,
     titolo: string,
     cliente: string,

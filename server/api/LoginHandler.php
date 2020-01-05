@@ -14,13 +14,7 @@ class LoginHandler extends ApiHandler {
         if ($utente) {
             session_regenerate_id();
             $_SESSION['UTENTE'] = $utente;
-            $risposta =  new stdClass;
-            $risposta->matricola = $utente['matricola'];
-            $risposta->tipo = $utente['tipo'];
-            $risposta->nome = $utente['nome'];
-            $risposta->cognome = $utente['cognome'];
-            $risposta->punto_vendita = $utente['punto_vendita'];
-            return $risposta;
+            return $utente;
         } else {
             throw new Exception ("Utente o password errati");
         }

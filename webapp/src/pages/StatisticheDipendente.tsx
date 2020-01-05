@@ -89,7 +89,7 @@ export const StatisticheDipendente : React.FC = () => {
         setStats(undefined);
     },[])
 
-    const leggiStatistica = React.useEffect ( ()=> {
+    React.useEffect ( ()=> {
         if (! giorno) return;
         setLoading(true)
         StatisticheAPI.perDipendente(giorno!)

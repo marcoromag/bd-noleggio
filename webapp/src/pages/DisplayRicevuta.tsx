@@ -23,7 +23,7 @@ export const DisplayRicevuta : React.FC<{id: string}> = ({id}) => {
             <Col xs="4"><h6>Numero ricevuta</h6></Col>
             <Col xs="8">{id}</Col>
             <Col xs="4"><h6>Data</h6></Col>
-            <Col xs="8">{}</Col>
+            <Col xs="8">{ricevuta.data}</Col>
             <Col xs="4"><h6>Totale</h6></Col>
             <Col xs="8">{ricevuta.totale}</Col>
             <Col xs="12">

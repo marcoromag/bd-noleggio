@@ -32,8 +32,8 @@ ADD build/db /tmp/db
 RUN service mysql start; cd /tmp/db; ./create_db.sh; rm -fr /tmp/db
 
 #Add web part
-ADD build/server/api /usr/share/noleggio/api
-ADD build/server/webapp /usr/share/noleggio/webapp
+ADD build/server/api /usr/share/api
+ADD build/server/webapp /usr/share/webapp
 ADD build/server/apache.conf /etc/apache2/conf-enabled/noleggio.conf
 
 # Allow ports

@@ -85,9 +85,11 @@ class DB {
 
     function login($username, $password) {
         $stmt = $this->prepare_statement ('login',
-        'select matricola, tipo, nome, cognome, punto_vendita '.
-        'from impiegato '. 
-        'where login=? and password =?'
+        'select matricola, tipo, impiegato.nome, cognome, punto_vendita, punto_vendita.nome as nome_punto_vendita
+        from impiegato 
+        join punto_vendita on punto_vendita.id = impiegato.punto_vendita
+        where login=? and password =?
+        '
         );
         $stmt->bind_param('ss',$username, $password);
 
@@ -109,7 +111,7 @@ class DB {
         $nomeLike = '%'.$parteNome.'%';
         $cognomeLike = '%'.$parteCognome.'%';
         $stmt = $this->prepare_statement ('selezionaClientePerNome',
-        'select cod_fiscale, nome, cognome, telefono_abitazione, telefono_cellulare, email, data_sottoscrizione, posizione_archivio
+        'select cod_fiscale, nome, cognome, data_nascita, indirizzo, cap, citta, telefono_abitazione, telefono_cellulare, email, data_sottoscrizione, posizione_archivio
         from cliente 
         left join documento_liberatoria on cliente.documento_liberatoria = documento_liberatoria.id
         where nome like ? and cognome like ?
@@ -122,7 +124,7 @@ class DB {
 
     function selezionaClientePerCodFiscale($cod_fiscale) {
         $stmt = $this->prepare_statement ('selezionaClienteCodFiscale',
-        'select cod_fiscale, nome, cognome, telefono_abitazione, telefono_cellulare, email, documento_liberatoria, data_sottoscrizione, posizione_archivio
+        'select cod_fiscale, nome, cognome, data_nascita, indirizzo, citta, cap, telefono_abitazione, telefono_cellulare, email, documento_liberatoria, data_sottoscrizione, posizione_archivio
         from cliente 
         left join documento_liberatoria on cliente.documento_liberatoria = documento_liberatoria.id
         where cod_fiscale=?
@@ -134,9 +136,9 @@ class DB {
 
     function inserisciCliente($cliente) {
         $stmt = $this->prepare_statement ('inserisciCliente',
-        'insert into cliente (cod_fiscale, nome, cognome, indirizzo, citta, cap, telefono_abitazione, telefono_cellulare, email)
-        values (?,?,?,?,?,?,?,?,?)');
-        $stmt->bind_param('sssssssss',$cliente->cod_fiscale, $cliente->nome, $cliente->cognome, $cliente->indirizzo, $cliente->citta, $cliente->cap, $cliente->telefono_abitazione, $cliente->telefono_cellulare, $cliente->email);
+        'insert into cliente (cod_fiscale, nome, cognome, data_nascita, indirizzo, citta, cap, telefono_abitazione, telefono_cellulare, email)
+        values (?,?,?,str_to_date(?,\'%Y-%m-%d\'),?,?,?,?,?,?)');
+        $stmt->bind_param('ssssssssss',$cliente->cod_fiscale, $cliente->nome, $cliente->cognome, $cliente->data_nascita, $cliente->indirizzo, $cliente->citta, $cliente->cap, $cliente->telefono_abitazione, $cliente->telefono_cellulare, $cliente->email);
         if (!$stmt->execute()) {
             throw new Exception($stmt->error);
         }
@@ -147,14 +149,13 @@ class DB {
         $stmt = $this->prepare_statement ('inserisciPrenotazione_check',
         'select tipo 
         from video 
-        join catalogo on catalogo.video = video.id 
-        where id=? and catalogo.punto_vendita=?'
+        where id=?'
         );
-        $stmt->bind_param('si',$video,$punto_vendita);
+        $stmt->bind_param('s',$video);
         $tipo = $this->fetch_single($stmt)['tipo'];
 
         if(!$tipo) {
-            throw new Exception("Video non a catalogo nel punto vendita");
+            throw new Exception("Video non a catalogo");
         }
 
         if ($tipo == 'DISPONIBILE') {
@@ -295,7 +296,7 @@ class DB {
         'select supporto.id, seriale, video, fornitore, supporto.punto_vendita,
          batch.data as data_carico, batch.data as data_carico, stato_fisico
          from supporto
-         left join batch on carico.id=batch_carico
+         left join batch on batch.id=batch_carico
          where batch_carico=?
         ');
         } else {
@@ -647,7 +648,7 @@ class DB {
 
     function selezionaRicevuta ($ricevuta) {
         $sel_ricevuta = $this->prepare_statement('selezionaRicevuta',
-        'select numero_ricevuta, supporto, titolo, cliente, nome, cognome, indirizzo, citta, cap, impiegato_nome, impiegato_cognome, matricola, data_inizio, data_restituzione, totale
+        'select numero_ricevuta, data, supporto, titolo, cliente, nome, cognome, indirizzo, citta, cap, impiegato_nome, impiegato_cognome, matricola, data_inizio, data_restituzione, totale
         from v_ricevuta
         where numero_ricevuta=?');
         $sel_ricevuta->bind_param('s',$ricevuta);

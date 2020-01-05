@@ -1,3 +1,3 @@
 export default {
-    apiBaseUrl: '/noleggio/api'
+    apiBaseUrl: '/api'
 }

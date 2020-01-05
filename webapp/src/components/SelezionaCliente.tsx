@@ -36,7 +36,7 @@ export const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void, 
     </Col>
     {listaClienti && 
     <Col xs="12">
-        {listaClienti.map( c => <Card>
+        {listaClienti.map( c => <Card className="mt-4">
             <CardHeader>
                 <Row>
                     <Col xs>
@@ -49,31 +49,18 @@ export const SelezionaCliente : React.FC<{onSelect: (cliente: Cliente) => void, 
             </CardHeader>
             <CardBody>
                 <Row>
-                    <Col xs="12" sm="12">
+                    <Col xs="12" sm="6">
                         <FormGroup>
                             <FormText>Indirizzo</FormText>
-                            <Label>{c.indirizzo}</Label>
+                            <span className="d-block">{c.indirizzo}</span>
+                            <span className="d-block">{c.cap} {c.citta}</span>
                         </FormGroup>
                     </Col>
-                    <Col xs="6" sm="6">
-                        <FormGroup>
-                            <FormText>Città</FormText>
-                            <Label>{c.citta}</Label>
-                        </FormGroup>
-                    </Col>
-                    <Col xs="6" sm="6">
-                        <FormGroup>
-                            <FormText>Cap</FormText>
-                            <Label>{c.cap}</Label>
-                        </FormGroup>
-                    </Col>
-                    <Col xs="6" sm="6">
+                    <Col xs="12" sm="6">
                         <FormGroup>
                             <FormText>Telefono abitazione</FormText>
                             <Label>{c.telefono_abitazione}</Label>
                         </FormGroup>
-                    </Col>
-                    <Col xs="6" sm="6">
                         <FormGroup>
                             <FormText>Telefono cellulare</FormText>
                             <Label>{c.telefono_cellulare}</Label>

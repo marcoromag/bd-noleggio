@@ -4,6 +4,8 @@ import { FormGroup, Col, Label, Input, Button } from 'reactstrap';
 import ClienteAPI, { Cliente } from '../api/ClienteAPI';
 import { useHistory } from 'react-router';
 import { InfoMessage } from '../components/Info';
+import DatePicker from 'react-date-picker';
+import { isodate } from '../api/utils';
 
 const useInput = (field: keyof Cliente, cliente: Cliente, setCliente: (c: Cliente)=>void) => ({
     value: cliente[field],
@@ -27,7 +29,7 @@ export const NuovoCliente : React.FC = () => {
     const inputEmail = useInput('email',cliente, setCliente)
     const allInput = cliente.nome && cliente.cognome && cliente.cod_fiscale 
         && cliente.indirizzo && cliente.citta && cliente.cap && cliente.email
-        && cliente.telefono_abitazione && cliente.telefono_cellulare
+        && cliente.telefono_abitazione && cliente.telefono_cellulare && cliente.data_nascita
     ;
     const creaCliente = React.useCallback ( async () => {
         try {
@@ -37,6 +39,12 @@ export const NuovoCliente : React.FC = () => {
             setErrore(e.message)
         }            
     },[cliente, history])
+
+    const changeDataNascita = React.useCallback( (d: Date | Date[]) => {
+        if (Array.isArray(d)) return;
+        setCliente(c => ({...c, data_nascita:isodate(d)}));
+    },[])
+
 
     return <Layout titolo="Nuovo cliente" errore={errore}
         headline={<>Crea un nuovo cliente riempiendo questo form. 
@@ -49,19 +57,25 @@ export const NuovoCliente : React.FC = () => {
         <Col xs="12">
             <h3>Dati anagrafici</h3>
         </Col>
-        <Col xs="12" sm="4">
+        <Col xs="12" sm="6">
             <FormGroup>
                 <Label>Nome</Label>
                 <Input {...inputNome} type="text" />
             </FormGroup>
         </Col>
-        <Col xs="12" sm="4">
+        <Col xs="12" sm="6">
             <FormGroup>
                 <Label>Cognome</Label>
                 <Input {...inputCognome} type="text" />
             </FormGroup>
         </Col>
-        <Col xs="12" sm="4">
+        <Col xs="12" sm="6">
+            <FormGroup>
+                <Label>Data di nascita</Label>
+                <DatePicker className="form-control datepicker_cust" onChange={changeDataNascita} value={cliente.data_nascita ? new Date(cliente.data_nascita) : undefined} />
+            </FormGroup>
+        </Col>
+        <Col xs="12" sm="6">
             <FormGroup>
                 <Label>Codice fiscale</Label>
                 <Input {...inputCodFiscale} type="text" />

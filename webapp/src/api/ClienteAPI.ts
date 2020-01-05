@@ -9,6 +9,7 @@ export interface DocumentoLiberatoria {
 
 export interface Cliente {
     cod_fiscale: string,
+    data_nascita: string,
     nome: string,
     cognome: string,
     indirizzo: string,
