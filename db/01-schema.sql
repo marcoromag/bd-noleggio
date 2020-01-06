@@ -23,8 +23,6 @@ create or replace table impiegato (
 	constraint fk_impiegato_punto_vendita FOREIGN key (punto_vendita) REFERENCES punto_vendita(id)
 );
 
-alter table impiegato add constraint ck_unico_dirigente check ( (select count(*) from impiegato where punto_vendita=`punto_vendita` and tipo='DIRIGENTE') <= 1);
-
 create or replace table fornitore (
 	id varchar(36) not null,
 	nome varchar(64) not null,
