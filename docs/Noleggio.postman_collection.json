@@ -25,17 +25,12 @@
 							"raw": "{ \"utente\":\"admin_rm_1\", \"password\":\"password\"}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/utente/login",
+							"raw": "http://{{noleggio_url}}/api/utente/login",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"utente",
 								"login"
@@ -58,22 +53,18 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"utente\":\"admin_rm_1\", \"password\":\"password\"}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/login",
+							"raw": "http://{{noleggio_url}}/api/utente/logout",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
-								"login"
+								"utente",
+								"logout"
 							]
 						}
 					},
@@ -89,17 +80,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/utente",
+							"raw": "http://{{noleggio_url}}/api/utente",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"utente"
 							]
@@ -122,26 +108,20 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/catalogo/ricerca/titolo?titolo=Matrix",
+							"raw": "http://{{noleggio_url}}/api/catalogo/ricerca?titolo=matrix",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"catalogo",
-								"ricerca",
-								"titolo"
+								"ricerca"
 							],
 							"query": [
 								{
 									"key": "titolo",
-									"value": "Matrix"
+									"value": "matrix"
 								}
 							]
 						}
@@ -158,26 +138,24 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/catalogo/ricerca/titolo?titolo=Matrix",
+							"raw": "http://{{noleggio_url}}/api/catalogo/ricerca?genere=Horror&pagina=2",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"catalogo",
-								"ricerca",
-								"titolo"
+								"ricerca"
 							],
 							"query": [
 								{
-									"key": "titolo",
-									"value": "Matrix"
+									"key": "genere",
+									"value": "Horror"
+								},
+								{
+									"key": "pagina",
+									"value": "2"
 								}
 							]
 						}
@@ -194,27 +172,16 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/catalogo/ricerca/titolo?titolo=Matrix",
+							"raw": "http://{{noleggio_url}}/api/video/tt0056016/supporti",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
-								"catalogo",
-								"ricerca",
-								"titolo"
-							],
-							"query": [
-								{
-									"key": "titolo",
-									"value": "Matrix"
-								}
+								"video",
+								"tt0056016",
+								"supporti"
 							]
 						}
 					},
@@ -239,20 +206,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"cod_fiscale\": \"RMGMRC77L13E791T\",\n    \"termine\":\"4\",\n    \"supporto\":\"b4709f55-293c-11ea-928c-0242ac110002\"\n}"
+							"raw": "{\n    \"cod_fiscale\": \"RMGMRC77L13E791T\",\n    \"termine\":\"4\",\n    \"supporto\":\"819280a5-2d8a-11ea-b9c4-0242ac110002\"\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/noleggio",
+							"raw": "http://{{noleggio_url}}/api/noleggio",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"noleggio"
 							]
@@ -274,22 +236,52 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"cod_fiscale\": \"RMGMRC77L13E791T\",\n    \"termine\":\"4\",\n    \"supporto\":\"b4709f55-293c-11ea-928c-0242ac110002\"\n}"
+							"raw": "{\n    \"stato\": \"DANNEGGIATO\",\n    \"data_restituzione\": \"2020-01-10\"\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/noleggio",
+							"raw": "http://{{noleggio_url}}/api/noleggio/1ec00d0e-2d8e-11ea-b9c4-0242ac110002",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
-								"noleggio"
+								"noleggio",
+								"1ec00d0e-2d8e-11ea-b9c4-0242ac110002"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ricevuta",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/ricevuta/3ef1e536-2d8e-11ea-b9c4-0242ac110002",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"ricevuta",
+								"3ef1e536-2d8e-11ea-b9c4-0242ac110002"
 							]
 						}
 					},
@@ -320,20 +312,15 @@
 							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/cliente/RMGMRC77L13E791",
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"cliente",
-								"RMGMRC77L13E791"
+								"RMGMRC77L13E791T"
 							]
 						}
 					},
@@ -353,20 +340,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"cod_fiscale\": \"RMGMRC77L13E791T\",\n    \"nome\": \"marco\",\n    \"cognome\": \"Romagnuolo\",\n    \"telefono_abitazione\": \"066002001\",\n    \"telefono_cellulare\": \"0767222222\",\n    \"email\": \"marcoromag@gmail.com\",\n    \"data_sottoscrizione\": null,\n    \"posizione_archivio\": null\n}"
+							"raw": "{\n    \"nome\": \"Marco\",\n    \"cognome\": \"Romagnuolo\",\n    \"cod_fiscale\": \"RMGMRC77L13E791K\",\n    \"data_nascita\": \"2000-01-01\",\n    \"indirizzo\": \"Via Masala 42\",\n    \"citta\": \"Roma\",\n    \"cap\": \"00148\",\n    \"email\": \"marcoromag@gmail.com\",\n    \"telefono_abitazione\": \"0767222222\",\n    \"telefono_cellulare\": \"0767222222\"\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/cliente",
+							"raw": "http://{{noleggio_url}}/api/cliente",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"cliente"
 							]
@@ -391,21 +373,154 @@
 							"raw": "{\n\t\"id\":\"CI00003\",\n\t\"posizione_archivio\": \"terzo cassetto\",\n\t\"data_sottoscrizione\":\"2019-12-28\"\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/cliente/RMGMRC77L13E791T/documento",
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T/documento",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"cliente",
 								"RMGMRC77L13E791T",
 								"documento"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crea prenotazione",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T/prenotazione/new-joker",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"cliente",
+								"RMGMRC77L13E791T",
+								"prenotazione",
+								"new-joker"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "lista prenotazioni",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\":\"CI00003\",\n\t\"posizione_archivio\": \"terzo cassetto\",\n\t\"data_sottoscrizione\":\"2019-12-28\"\n}"
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T/prenotazione",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"cliente",
+								"RMGMRC77L13E791T",
+								"prenotazione"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "noleggi attivi per cliente",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\":\"CI00003\",\n\t\"posizione_archivio\": \"terzo cassetto\",\n\t\"data_sottoscrizione\":\"2019-12-28\"\n}"
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T/noleggi",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"cliente",
+								"RMGMRC77L13E791T",
+								"noleggi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "noleggi terminati per cliente",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\":\"CI00003\",\n\t\"posizione_archivio\": \"terzo cassetto\",\n\t\"data_sottoscrizione\":\"2019-12-28\"\n}"
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/cliente/RMGMRC77L13E791T/noleggi-terminati",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"cliente",
+								"RMGMRC77L13E791T",
+								"noleggi-terminati"
 							]
 						}
 					},
@@ -431,20 +546,20 @@
 							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/cliente/RMGMRC77L13E791",
+							"raw": "http://{{noleggio_url}}/api/cliente?nome=mar",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
-								"cliente",
-								"RMGMRC77L13E791"
+								"cliente"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "mar"
+								}
 							]
 						}
 					},
@@ -469,20 +584,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"data\":\"2020-05-01\"\n}"
+							"raw": "{\n\t\"fornitore\":\"CLY\",\n\t\"data\":\"2020-05-01\"\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/batch/scarico",
+							"raw": "http://{{noleggio_url}}/api/batch/scarico",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"batch",
 								"scarico"
@@ -511,20 +621,15 @@
 							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"data\":\"2019-12-13\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/batch/07344efb-295e-11ea-928c-0242ac110002",
+							"raw": "http://{{noleggio_url}}/api/batch/8bd09d5f-2fa6-11ea-a386-0242ac110002",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"batch",
-								"07344efb-295e-11ea-928c-0242ac110002"
+								"8bd09d5f-2fa6-11ea-a386-0242ac110002"
 							]
 						}
 					},
@@ -544,20 +649,15 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"data\":\"2019-12-13\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
+							"raw": "{\n\t\"fornitore\":\"CLY\",\n\t\"data\":\"2019-12-11\",\n\t\"lista\":[{\n\t\t\"video\":\"tt0056016\",\n\t\t\"seriale\":\"SER1008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"tt0107004\",\n\t\t\"seriale\":\"SER1009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"tt1875337\",\n\t\t\"seriale\":\"SER1010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/batch/carico",
+							"raw": "http://{{noleggio_url}}/api/batch/carico",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"batch",
 								"carico"
@@ -586,17 +686,12 @@
 							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"data\":\"2019-12-13\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/batch",
+							"raw": "http://{{noleggio_url}}/api/batch",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"batch"
 							]
@@ -619,17 +714,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/fornitori",
+							"raw": "http://{{noleggio_url}}/api/fornitori",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"fornitori"
 							]
@@ -647,17 +737,12 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/generi",
+							"raw": "http://{{noleggio_url}}/api/generi",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
 								"generi"
 							]
@@ -675,19 +760,88 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8090/noleggio/api/fornitori",
+							"raw": "http://{{noleggio_url}}/api/termini_noleggio",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{noleggio_url}}"
 							],
-							"port": "8090",
 							"path": [
-								"noleggio",
 								"api",
-								"fornitori"
+								"termini_noleggio"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Statistiche",
+			"item": [
+				{
+					"name": "per impiegato",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/statistiche/2020-01-02/impiegati",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"statistiche",
+								"2020-01-02",
+								"impiegati"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "per punto vendita",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"fornitore\":\"COL\",\n\t\"lista\":[{\n\t\t\"video\":\"VID_02\",\n\t\t\"seriale\":\"SER0008\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0009\",\n\t\t\"costo_supporto\": 10.50\n\t},\n\t{\n\t\t\"video\":\"VID_01\",\n\t\t\"seriale\":\"SER0010\",\n\t\t\"costo_supporto\": 10.50\n\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "http://{{noleggio_url}}/api/statistiche/2020-01-03",
+							"protocol": "http",
+							"host": [
+								"{{noleggio_url}}"
+							],
+							"path": [
+								"api",
+								"statistiche",
+								"2020-01-03"
 							]
 						}
 					},
