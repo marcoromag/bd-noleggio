@@ -1,7 +1,7 @@
 <?php
 
 class CaricoHandler extends ApiHandler {
-    function autorizza ($utente) { return $utente && $utente['tipo'] == 'DIRIGENTE'; }
+    function autorizza ($utente) { return $utente; }
     function gestisce($uri, $method) { return $method == 'POST' && $uri == '/batch/carico'; }
     function esegui($uri, $method, $input) { 
         $data = date("Y-m-d");
@@ -19,7 +19,7 @@ class CaricoHandler extends ApiHandler {
 }
 
 class ScaricoHandler extends ApiHandler {
-    function autorizza ($utente) { return $utente && $utente['tipo'] == 'DIRIGENTE'; }
+    function autorizza ($utente) { return $utente; }
     function gestisce($uri, $method) { return $method == 'POST' && $uri == '/batch/scarico'; }
     function esegui($uri, $method, $input) { 
         $data = date("Y-m-d");

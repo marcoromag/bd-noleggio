@@ -62,7 +62,7 @@ export const Header : React.FC = () => {
               </DropdownMenu>
             </UncontrolledDropdown>
             }
-            {isAdmin && 
+            {isOper && 
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Batch</DropdownToggle>
               <DropdownMenu left>
