@@ -37,7 +37,7 @@ class ScaricoHandler extends ApiHandler {
 }
 
 class ListaBatchHandler extends ApiHandler {
-    function autorizza ($utente) { return $utente && $utente['tipo'] == 'DIRIGENTE'; }
+    function autorizza ($utente) { return $utente ; }
     function gestisce($uri, $method) { return $method == 'GET' && $uri == '/batch'; }
     function esegui($uri, $method, $input) { 
         $utente = $_SESSION['UTENTE'];
@@ -48,7 +48,7 @@ class ListaBatchHandler extends ApiHandler {
 
 class SelezionaBatchHandler extends ApiHandler {
     static $pathRegexp = '@^/batch/([^/]+)@';
-    function autorizza ($utente) { return $utente && $utente['tipo'] == 'DIRIGENTE'; }
+    function autorizza ($utente) { return $utente; }
     function gestisce($path, $method) { return $method == 'GET' && preg_match(self::$pathRegexp,$path); }
     function esegui($path, $method, $input) {
         if (!preg_match(self::$pathRegexp,$path,$match)) {
